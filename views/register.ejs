@@ -1,23 +1,32 @@
+<!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InnovationProject</title>
+    <title>Register</title>
+    <link rel="stylesheet" href="/css/main.css" type="text/css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500&display=swap" rel="stylesheet">
 </head>
-<h1>Register</h1>
 <form action="/register" method="POST">
-    <div>
-        <label for="name">Name</label>
-        <input type="text" id="name" name="name" required>
+<body class="bg-bluish">
+    <div class="grid grid-cols-5 grid-rows-4 gap-4">
+        <div class="font-serif col-start-2 col-end-3 row-start-2 row-end-3 text-3xl text-teal-800">Register</div>
+        <div class="row-start-2 row-end-3 col-start-3 col-end-3 text-2xl text-teal-800">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" required></input>
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div class="row-start-3 row-end-4 col-start-3 col-end-3">
+            <button class="text-white bg-teal-700 hover:bg-teal-800 focus:outline-none focus:ring-4 focus:ring-teal-300
+            font-medium rounded-full text-sm text-center dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800 
+            p-4" type="submit">Register</button>
+        </div>
     </div>
-    <div>
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" required>
-    </div>
-    <div>
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required>
-    </div>
-    <button type="submit">Register</button>
+</body>
 </form>
-<a href="/login">Login</a>
+</html>

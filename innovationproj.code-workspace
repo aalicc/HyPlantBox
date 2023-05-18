@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "Inno",
+			"path": "../../Documents/PlatformIO/Projects/Inno/Inno"
+		}
+	],
+	"settings": {}
+}

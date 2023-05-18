@@ -4,65 +4,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InnovationProject</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../styles/index.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="/css/main.css" type="text/css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500&display=swap" rel="stylesheet">
 </head>
-<body>
-
-<main>
-    <div class="d-inline-flex flex-column align-self-stretch flex-shrink-0 p-3 text-white bg-success" style="width: 280px;">
-        <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-            <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"/></svg>
-            <span class="fs-4">MoistPlants©</span>
-        </a>
-        <hr>
-        <ul class="nav nav-pills flex-column mb-auto">
-            <li class="nav-item">
-                <a href="#" class="nav-link active" aria-current="page">
-                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"/></svg>
-                    Monitoring
-                </a>
-            </li>
-            <li>
-                <a href="#" class="nav-link text-white">
-                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"/></svg>
-                    Control Panel
-                </a>
-            </li>
-            <li>
-                <a href="#" class="nav-link text-white">
-                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"/></svg>
-                    History
-                </a>
-            </li>
-            <li>
-                <a href="#" class="nav-link text-white">
-                    <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"/></svg>
-                    About
-                </a>
-            </li>
-        </ul>
-        <div class="dropdown md-auto">
-            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                <img src="https://pbs.twimg.com/profile_images/950739640113246208/0e2nBZUK_400x400.jpg" alt="" width="32" height="32" class="rounded-circle me-2">
-                <strong>Profile</strong>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                <li><a class="dropdown-item" href="#">New project...</a></li>
-                <li><a class="dropdown-item" href="#">Settings</a></li>
-                <li><a class="dropdown-item" href="#">Profile</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="#">Sign out</a></li>
-            </ul>
-        </div>
+<body class="bg-bluish">
+<div class="grid grid-cols-3 grid-rows-2 gap-4">
+    <div class="relative fixed top-0 left-0 h-screen w-56 m-0 flex flex-col bg-greeny text-black shadow-lg p-7 space-y-12 row-span-2">
+        <i>ICON</i>
+        <a href="/home" class="text-2xl text-teal-50 font-navbar">Monitoring</a>
+        <a href="/cp" class="text-2xl text-teal-50 font-navbar">Control Panel</a>
+        <a href="/hist" class="text-2xl text-teal-50 font-navbar">History</a>
+        <a href="abt" class="text-2xl text-teal-50 font-navbar">About</a>
     </div>
-    <div class="d-inline-flex flex-column flex-shrink-0 p-3 text-white bg-success align-items-stretch" style="width: 280px;">
-        <form action="/logout?_method=DELETE" method="POST">
-            <button type="submit">Log Out</button>
-        </form>
+    <div class="container" style="position: relative; height: 300px; width: 300px">
+        <canvas id="myChart"></canvas>
     </div>
-</main>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let myChart = document.getElementById('myChart').getContext('2d')
+        let phChart = new Chart(myChart, {
+            type: 'line',
+            data: {
+                labels:['', '','Water tank 1', '', ''],
+                datasets:[{
+                    label: 'PH Level',
+                    data:[
+                        6.5,
+                        6.5,
+                        6.8,
+                        6.7,
+                        6.3
+                    ]
+                }]
+            },
+            options:{},
+        })
+    </script>
+    <div class="container" style="position: relative; height: 300px; width: 300px">
+        <canvas id="myChart2"></canvas>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let myChart2 = document.getElementById('myChart2').getContext('2d')
+        let phChart2 = new Chart(myChart2, {
+            type: 'line',
+            data: {
+                labels:['', '','Water tank 1', '', ''],
+                datasets:[{
+                    label: 'PH Level',
+                    data:[
+                        6.5,
+                        6.5,
+                        6.8,
+                        6.7,
+                        6.3
+                    ]
+                }]
+            },
+            options:{},
+        })
+    </script>
+    <div class="container" style="position: relative; height: 300px; width: 300px">
+        <canvas id="myChart3"></canvas>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let myChart3 = document.getElementById('myChart3').getContext('2d')
+        let phChart3 = new Chart(myChart3, {
+            type: 'line',
+            data: {
+                labels:['', '','Water tank 1', '', ''],
+                datasets:[{
+                    label: 'PH Level',
+                    data:[
+                        6.5,
+                        6.5,
+                        6.8,
+                        6.7,
+                        6.3
+                    ]
+                }]
+            },
+            options:{},
+        })
+    </script>
+    <div class="container" style="position: relative; height: 300px; width: 300px">
+        <canvas id="myChart4"></canvas>
+    </div>
+    <script>
+        let myChart4 = document.getElementById('myChart4').getContext('2d')
+        let phChart4 = new Chart(myChart4, {
+            type: 'line',
+            data: {
+                labels:['', '','Water tank 1', '', ''],
+                datasets:[{
+                    label: 'PH Level',
+                    data:[
+                        6.5,
+                        6.5,
+                        6.8,
+                        6.7,
+                        6.3
+                    ]
+                }]
+            },
+            options:{},
+        })
+    </script>
+</div>
 </body>
-
 </html>
