@@ -15,6 +15,8 @@ const db = require('./db/users')
 const {SerialPort} = require('serialport')
 const {ReadlineParser} = require('@serialport/parser-readline')
 const knex = require('./db/knex.js')
+const raspi = require('raspi')
+const Serial = require('raspi-serial').Serial
 
 
 const initializePassport = require('./passport-config')
@@ -46,10 +48,21 @@ let tds//
 let orp//
 let co2//
 
+/*
+raspi.init(() => {
+    let serial = new Serial()
+    serial.open(() => {
+        process.stdout.write(data)
+    })
+    serial.write('Hello from raspi-serial')
+})*/
+
 //serial connection
-const port = new SerialPort({
-    path:'COM3',
-    baudRate: 19200,
+
+
+const port = new SerialPort({ //if using gpio then switching to onoff library
+    path:'/dev/ttyS0', //try connecting via pins
+    baudRate: 9600,
     autoOpen: false
 })
 
@@ -61,15 +74,11 @@ port.open((err) => {
     } else {
       console.log('Serial port opened.')
 
-      port.on('data', (line) => {
-        console.log(line)
-      })
-
       port.pipe(parser)
       // Read data from the serial port
       parser.on('data', (line) => { //async maybe?
         console.log(line)
-        /*const arr = line.split('&')
+        const arr = line.split('&')
         //all variables are for debugging
         temp1 = arr[0]  //needs SQL storage...and graph output, 
         temp2 = arr[1]
@@ -99,7 +108,7 @@ port.open((err) => {
                  tds: arr[5] ,
                  orp: arr[6] ,
                  co2: arr[7] }
-            ])*/
+            ])
         })
   
       // Write data to the serial port
@@ -114,10 +123,8 @@ port.open((err) => {
     }
   })
   
-  // Close the serial port on exit
-  /*process.on('exit', () => {
-    port.close();
-  });
+
+  /*
 
 //const parser = port.pipe(new ReadlineParser({ delimiter: '\r\n' }))
 
