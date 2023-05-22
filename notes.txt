@@ -11,3 +11,9 @@ Database created, queries not finished
 serial monitor is the key, turn node app into serial monitor
 
 parser
+
+Potential css frames: 
+Bootstrap
+DaisyUI
+Bulma!!
+Chakra

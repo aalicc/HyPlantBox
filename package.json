@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon server.js",
-    "build": "tailwindcss -i ./input.css -o ./views/css/main.css",
-    "watch": "tailwindcss -i ./input.css -o ./views/css/main.css --watch"
+    "build": "tailwindcss -i ./input.css -o ./dist/output.css",
+    "watch": "tailwindcss -i ./input.css -o ./dist/output.css --watch"
   },
   "author": "",
   "license": "ISC",
@@ -28,13 +28,12 @@
     "readline": "^1.3.0",
     "serialport": "^10.5.0",
     "sqlite3": "^5.0.2",
-    "tailwindcss": "^3.1.8",
     "typescript": "^4.9.4"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",
     "dotenv": "^10.0.0",
     "nodemon": "^2.0.15",
-    "tailwindcss": "^3.1.8"
+    "tailwindcss": "^3.3.2"
   }
 }
