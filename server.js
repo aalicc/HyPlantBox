@@ -2,6 +2,8 @@ if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config()
 }
 
+//FYI CHANGE RASPBERRY PI SERIAL CONFIG SETTINGS
+
 //packages
 const express = require('express')
 const app = express()
@@ -48,18 +50,7 @@ let tds//
 let orp//
 let co2//
 
-/*
-raspi.init(() => {
-    let serial = new Serial()
-    serial.open(() => {
-        process.stdout.write(data)
-    })
-    serial.write('Hello from raspi-serial')
-})*/
-
 //serial connection
-
-
 const port = new SerialPort({ //if using gpio then switching to onoff library
     path:'/dev/ttyS0', //try connecting via pins
     baudRate: 9600,
@@ -88,14 +79,14 @@ port.open((err) => {
         tds = arr[5]
         orp = arr[6]
         co2 = arr[7]
-        console.log(temp1)
+        /*console.log(temp1)
         console.log(temp2)
         console.log(ph)
         console.log(hum)
         console.log(ec)
         console.log(tds)
         console.log(orp)
-        console.log(co2) // next goes graphs and C parsing
+        console.log(co2)*/ // next goes graphs and C parsing
         this.dataArray = JSON.stringify(arr)
     
         knex.measureddb('Measurements').insert(
@@ -111,7 +102,7 @@ port.open((err) => {
             ])
         })
   
-      // Write data to the serial port
+      // Write data to the serial port //THE FORMAT IS CORRECT DO NOT CHANGE
       const sendData = 'Hello, Controllino!'
       port.write(sendData, (err) => {
         if (err) {
@@ -123,18 +114,7 @@ port.open((err) => {
     }
   })
   
-
-  /*
-
-//const parser = port.pipe(new ReadlineParser({ delimiter: '\r\n' }))
-
-port.write('GO FUCK YOURSELF', function(err){
-    if (err) {
-        return console.log('Error on write lol ', err.message)
-    }
-    console.log('message written')
-})
-
+  /*        //code that might be needed later for reference/rework
 port.on('data', (line) => { //async maybe?
     console.log )
     const arr = line.split('&')
@@ -235,27 +215,6 @@ app.get('/hist', checkAuthenticated, (req,res) => {
 
 app.get('/abt', checkAuthenticated, (req,res) => {
     res.render('about.ejs')
-})
-
-app.get('/api', async(req, res) => {
-    //add variables that are going to keep the controllino sensor values
-    //write a new SQL script...or find a new way?
-
-    level = req.query.lvl
-    power = req.query.pwr
-    pumps = req.query.pmp
-    heater = req.query.htr
-    buzzer = req.query.bzr
-    light1 = req.query.lt1
-    light2 = req.query.lt2
-    wtemp = req.query.wtmp
-    ph = req.query.ph
-    tds = req.query.tds
-    orp = req.query.orp
-    co2 = req.query.co2
-
-    //add the response that the controllino needs, probably to a different route
-    //take a look at the front end plan, and start working
 })
 
 app.delete('/logout', (req, res) => {

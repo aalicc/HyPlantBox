@@ -1,23 +1,24 @@
-const knex = require('./knex')
+const knex = require('knex');
+const { usersdb } = require('./knex');
 
 function createUser(user){
-    return knex('userCredentials').insert(user);
+    return usersdb('userCredentials').insert(user);
 }
 
 function getUser(id){
-    return knex('userCredentials').where('id', id).select()
+    return usersdb('userCredentials').where('id', id).select()
 }
 
 function getAllUsers(){
-    return knex('userCredentials').select('*')
+    return usersdb('userCredentials').select('*')
 }
 
 function deleteUser(id){
-    return knex('userCredentials').where('id', id).del()
+    return usersdb('userCredentials').where('id', id).del()
 }
 
 function updateUser(id, user){
-    return knex('userCredentials').where('id', id).update(user)
+    return usersdb('userCredentials').where('id', id).update(user)
 }
 
 module.exports = {

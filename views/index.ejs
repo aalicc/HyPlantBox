@@ -8,111 +8,98 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-bluish">
-<div class="grid grid-cols-3 grid-rows-2 gap-4">
-    <div class="relative fixed top-0 left-0 h-screen w-56 m-0 flex flex-col bg-greeny text-black shadow-lg p-7 space-y-12 row-span-2">
-        <i>ICON</i>
-        <a href="/home" class="text-2xl text-teal-50 font-navbar">Monitoring</a>
-        <a href="/cp" class="text-2xl text-teal-50 font-navbar">Control Panel</a>
-        <a href="/hist" class="text-2xl text-teal-50 font-navbar">History</a>
-        <a href="abt" class="text-2xl text-teal-50 font-navbar">About</a>
-    </div>
-    <div class="container" style="position: relative; height: 300px; width: 300px">
+<div class="flex flex-col h-screen">
+<div class="flex-auto bg-gray-200">
+    <div class="container">
         <canvas id="myChart"></canvas>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        let myChart = document.getElementById('myChart').getContext('2d')
-        let phChart = new Chart(myChart, {
+        let ctxcanvas = document.getElementById('myChart').getContext('2d')
+        let data = {
+            labels: ['Water tank 1'],
+            datasets: [{
+                label: 'Sample Chart',
+                data: [12, 19, 3, 5, 2, 3]
+            }]
+        }
+        let phChart = new Chart(ctxcanvas, {
             type: 'line',
-            data: {
-                labels:['', '','Water tank 1', '', ''],
-                datasets:[{
-                    label: 'PH Level',
-                    data:[
-                        6.5,
-                        6.5,
-                        6.8,
-                        6.7,
-                        6.3
-                    ]
-                }]
-            },
-            options:{},
+            data: data,
+            options: {
+                responsive: true,
+            }
         })
     </script>
-    <div class="container" style="position: relative; height: 300px; width: 300px">
+</div>
+<div class="flex-auto bg-gray-200">
+    <div class="container">
         <canvas id="myChart2"></canvas>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        let myChart2 = document.getElementById('myChart2').getContext('2d')
-        let phChart2 = new Chart(myChart2, {
+        let ctxcanvas2 = document.getElementById('myChart2').getContext('2d')
+        let data2 = {
+            labels: ['Water tank 1'],
+            datasets: [{
+                label: 'Sample Chart',
+                data: [12, 19, 3, 5, 2, 3]
+            }]
+        }
+        let phChart2 = new Chart(ctxcanvas2, {
             type: 'line',
-            data: {
-                labels:['', '','Water tank 1', '', ''],
-                datasets:[{
-                    label: 'PH Level',
-                    data:[
-                        6.5,
-                        6.5,
-                        6.8,
-                        6.7,
-                        6.3
-                    ]
-                }]
-            },
-            options:{},
+            data: data,
+            options: {
+                responsive: true,
+            }
         })
     </script>
-    <div class="container" style="position: relative; height: 300px; width: 300px">
+</div>
+<div class="flex-auto bg-gray-200">
+    <div class="container">
         <canvas id="myChart3"></canvas>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        let myChart3 = document.getElementById('myChart3').getContext('2d')
-        let phChart3 = new Chart(myChart3, {
+        let ctxcanvas3 = document.getElementById('myChart3').getContext('2d')
+        let data3 = {
+            labels: ['Water tank 1'],
+            datasets: [{
+                label: 'Sample Chart',
+                data: [12, 19, 3, 5, 2, 3]
+            }]
+        }
+        let phChart3 = new Chart(ctxcanvas3, {
             type: 'line',
-            data: {
-                labels:['', '','Water tank 1', '', ''],
-                datasets:[{
-                    label: 'PH Level',
-                    data:[
-                        6.5,
-                        6.5,
-                        6.8,
-                        6.7,
-                        6.3
-                    ]
-                }]
-            },
-            options:{},
+            data: data,
+            options: {
+                responsive: true,
+            }
         })
     </script>
-    <div class="container" style="position: relative; height: 300px; width: 300px">
+</div>
+<div class="flex-auto bg-gray-200">
+    <div class="container">
         <canvas id="myChart4"></canvas>
     </div>
     <script>
-        let myChart4 = document.getElementById('myChart4').getContext('2d')
-        let phChart4 = new Chart(myChart4, {
+        let ctxcanvas4 = document.getElementById('myChart4').getContext('2d')
+        let data4 = {
+            labels: ['Water tank 1'],
+            datasets: [{
+                label: 'Sample Chart',
+                data: [12, 19, 3, 5, 2, 3]
+            }]
+        }
+        let phChart4 = new Chart(ctxcanvas4, {
             type: 'line',
-            data: {
-                labels:['', '','Water tank 1', '', ''],
-                datasets:[{
-                    label: 'PH Level',
-                    data:[
-                        6.5,
-                        6.5,
-                        6.8,
-                        6.7,
-                        6.3
-                    ]
-                }]
-            },
-            options:{},
+            data: data4,
+            options: {
+                responsive: true,
+            }
         })
     </script>
+</div>
 </div>
 </body>
 </html>
