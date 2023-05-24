@@ -49,11 +49,12 @@ let ec//
 let tds//
 let orp//
 let co2//
+let lvl
 
 //serial connection
 const port = new SerialPort({ //if using gpio then switching to onoff library
     path:'/dev/ttyS0', //try connecting via pins
-    baudRate: 9600,
+    baudRate: 19200,
     autoOpen: false
 })
 
@@ -69,6 +70,7 @@ port.open((err) => {
       // Read data from the serial port
       parser.on('data', (line) => { //async maybe?
         console.log(line)
+        lvl = line
         const arr = line.split('&')
         //all variables are for debugging
         temp1 = arr[0]  //needs SQL storage...and graph output, 
@@ -203,6 +205,14 @@ app.post('/register', async (req,res) => {
     } catch {
         res.redirect('/register')
     }
+})
+
+app.get('/values', (req, res) => {
+    const response = {
+        value: lvl
+    }
+
+    res.json(response)
 })
 
 app.get('/cp', checkAuthenticated, (req,res) => {

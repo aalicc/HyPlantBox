@@ -1,22 +1,139 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InnovationProject</title>
-    <link rel="stylesheet" href="../dist/output.css" type="text/css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+  <style>
+    .window {
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .red-bg {
+      background-color: #FF3F3F;
+    }
+
+    .orange-bg {
+      background-color: #FFA53F;
+    }
+
+    .yellow-bg {
+      background-color: #FFD13F;
+    }
+
+    .green-bg {
+      background-color: #7FFF3F;
+    }
+
+    .blue-bg {
+      background-color: #3FA5FF;
+    }
+
+    .purple-bg {
+      background-color: #B53FFF;
+    }
+
+    .pink-bg {
+      background-color: #FF3F93;
+    }
+
+    .teal-bg {
+      background-color: #3FFF7C;
+    }
+
+    .violet-bg {
+      background-color: #E83FFF;
+    }
+
+    .coral-bg {
+      background-color: #FF3F70;
+    }
+  </style>
+  <title>Colored Windows</title>
 </head>
+
 <body>
-    <div class="flex flex-wrap h-screen">
-        <div class="w-1/3 h-1/3 bg-red-500"></div>
-        <div class="w-1/3 h-1/3 bg-green-500"></div>
-        <div class="w-1/3 h-1/3 bg-blue-500"></div>
-        <div class="w-1/3 h-1/3 bg-yellow-500"></div>
-        <div class="w-1/3 h-1/3 bg-purple-500"></div>
-        <div class="w-1/3 h-1/3 bg-pink-500"></div>
-        <div class="w-1/3 h-1/3 bg-indigo-500"></div>
-        <div class="w-1/3 h-1/3 bg-teal-500"></div>
-        <div class="w-1/3 h-1/3 bg-orange-500"></div>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 col-lg-4">
+        <div class="window red-bg">
+            Distance:
+            <span id="valueDisplay"></span>
+        </div>
       </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="window orange-bg">Window 2</div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="window yellow-bg">Window 3</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 col-lg-4">
+        <div class="window green-bg">Window 4</div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="window blue-bg">Window 5</div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="window purple-bg">Window 6</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 col-lg-4">
+        <div class="window pink-bg">Window 7</div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="window teal-bg">Window 8</div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="window violet-bg">Window 9</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 col-lg-4">
+        <div class="window coral-bg">Window 10</div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+  <script
+  src="https://code.jquery.com/jquery-3.7.0.js"
+  integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM="
+  crossorigin="anonymous"></script>
+  <script>
+    function fetchAndUpdateValue() {
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', '/values', true);
+
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      var data = JSON.parse(xhr.responseText);
+      var valueContainer = document.getElementById('valueDisplay');
+      if (valueContainer) {
+        valueContainer.textContent = data.value;
+      }
+    }
+  };
+
+  xhr.onerror = function () {
+    console.error('Error fetching data:', xhr.statusText);
+  };
+
+  xhr.send();
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  fetchAndUpdateValue();
+  setInterval(fetchAndUpdateValue, 500);
+});
+  </script>
 </body>
+
 </html>
