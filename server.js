@@ -17,9 +17,6 @@ const db = require('./db/users')
 const {SerialPort} = require('serialport')
 const {ReadlineParser} = require('@serialport/parser-readline')
 const knex = require('./db/knex.js')
-const raspi = require('raspi')
-const Serial = require('raspi-serial').Serial
-
 
 const initializePassport = require('./passport-config')
 const path = require("path");
@@ -32,27 +29,10 @@ initializePassport(
 
 //variables
 let users = []
-
-/*let level
-let power
-let pumps
-let heater
-let buzzer
-let light1
-let light2*/
-
-let temp1//
-let temp2//
-let ph//
-let hum//
-let ec//
-let tds//
-let orp//
-let co2//
-let lvl
+let values
 
 //serial connection
-const port = new SerialPort({ //if using gpio then switching to onoff library
+const port = new SerialPort({
     path:'/dev/ttyS0', //try connecting via pins
     baudRate: 19200,
     autoOpen: false
@@ -65,45 +45,13 @@ port.open((err) => {
       console.error('Error opening port:', err.message)
     } else {
       console.log('Serial port opened.')
-
-      port.pipe(parser)
+      port.pipe(parser)             //ALL VARIABLES NOT NEEDED, SPLITTING HAPPENS IN FRONT END SCRIPT
       // Read data from the serial port
       parser.on('data', (line) => { //async maybe?
         console.log(line)
-        lvl = line
-        const arr = line.split('&')
-        //all variables are for debugging
-        temp1 = arr[0]  //needs SQL storage...and graph output, 
-        temp2 = arr[1]
-        ph = arr[2]
-        hum = arr[3]
-        ec = arr[4]
-        tds = arr[5]
-        orp = arr[6]
-        co2 = arr[7]
-        /*console.log(temp1)
-        console.log(temp2)
-        console.log(ph)
-        console.log(hum)
-        console.log(ec)
-        console.log(tds)
-        console.log(orp)
-        console.log(co2)*/ // next goes graphs and C parsing
-        this.dataArray = JSON.stringify(arr)
-    
-        knex.measureddb('Measurements').insert(
-            [
-                { temp1: arr[0] ,
-                 temp2: arr[1] ,
-                 ph: arr[2] ,
-                 hum: arr[3] ,
-                 ec: arr[4] , 
-                 tds: arr[5] ,
-                 orp: arr[6] ,
-                 co2: arr[7] }
-            ])
-        })
-  
+        values = line
+      })
+
       // Write data to the serial port //THE FORMAT IS CORRECT DO NOT CHANGE
       const sendData = 'Hello, Controllino!'
       port.write(sendData, (err) => {
@@ -116,42 +64,6 @@ port.open((err) => {
     }
   })
   
-  /*        //code that might be needed later for reference/rework
-port.on('data', (line) => { //async maybe?
-    console.log )
-    const arr = line.split('&')
-    //all variables are for debugging
-    temp1 = arr[0]  //needs SQL storage...and graph output, 
-    temp2 = arr[1]
-    ph = arr[2]
-    hum = arr[3]
-    ec = arr[4]
-    tds = arr[5]
-    orp = arr[6]
-    co2 = arr[7]
-    console.log(temp1)
-    console.log(temp2)
-    console.log(ph)
-    console.log(hum)
-    console.log(ec)
-    console.log(tds)
-    console.log(orp)
-    console.log(co2) // next goes graphs and C parsing
-    this.dataArray = JSON.stringify(arr)
-
-    knex.measureddb('Measurements').insert(
-        [
-            { temp1: arr[0] ,
-             temp2: arr[1] ,
-             ph: arr[2] ,
-             hum: arr[3] ,
-             ec: arr[4] , 
-             tds: arr[5] ,
-             orp: arr[6] ,
-             co2: arr[7] }
-        ])
-})*/
-
 //package settings
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
@@ -208,33 +120,18 @@ app.post('/register', async (req,res) => {
 })
 
 app.get('/values', (req, res) => {
+    values = values + 
     const response = {
-        value: lvl
+        value: values
     }
 
     res.json(response)
-})
-
-app.get('/cp', checkAuthenticated, (req,res) => {
-    res.render('cp.ejs')
-})
-
-app.get('/hist', checkAuthenticated, (req,res) => {
-    res.render('hist.ejs')
-})
-
-app.get('/abt', checkAuthenticated, (req,res) => {
-    res.render('about.ejs')
 })
 
 app.delete('/logout', (req, res) => {
     req.logOut()
     res.redirect('/')
 })
-
-/*app.use(, (req,res) => {
-    res.status(404).render('404.ejs')
-})*/
 
 function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
