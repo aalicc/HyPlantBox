@@ -9,7 +9,8 @@
     .window {
       min-height: 30vh;
       display: flex;
-      align-items: stretch;
+      flex-direction: column;
+      align-items: center;
       justify-content: center;
       font-weight: normal;
     }
@@ -17,6 +18,7 @@
     .alerts {
       min-height: 8.2vh;
       display: flex;
+      flex-direction: row;
       align-items: center;
       justify-content: flex-start;
       font-weight: normal;
@@ -27,6 +29,7 @@
       /* CSS rules for small screens */
       body {
         font-size: 5vh;
+        color:aliceblue
       }
     }
 
@@ -35,6 +38,7 @@
       /* CSS rules for medium screens */
       body {
         font-size: 4vh;
+        color:aliceblue
       }
     }
 
@@ -43,51 +47,55 @@
       /* CSS rules for large screens */
       body {
         font-size: 2.6vh;
+        color:aliceblue
       }
     }
 
     .red-bg {
-      background-color: #922c2c;
+      background-color: #4aa96c;
     }
 
     .orange-bg {
-      background-color: #FFA53F;
+      background-color: #c19191;
     }
 
     .yellow-bg {
-      background-color: #FFD13F;
+      background-color: #eba83a;
     }
 
     .green-bg {
-      background-color: #7FFF3F;
+      background-color: #fd5e53;
     }
 
     .blue-bg {
-      background-color: #3FA5FF;
+      background-color: #4cacbc;
     }
 
     .purple-bg {
-      background-color: #B53FFF;
+      background-color: #4cacbc;
     }
 
     .pink-bg {
-      background-color: #FF3F93;
+      background-color: #fd5e53;
     }
 
     .teal-bg {
-      background-color: #3FFF7C;
+      background-color: #eba83a;
     }
 
     .violet-bg {
-      background-color: #E83FFF;
+      background-color: #c19191;
     }
 
     .coral-bg {
-      background-color: #FF3F70;
+      background-color: #eba83a;
     }
 
     .alerts-bg{
-      background-color: #edabfd;
+      background-color: #146356;
+    }
+    .alertsRed-bg{
+      background-color: #fd5e53;
     }
   </style>
   <title>MoistPlants</title>
@@ -99,25 +107,37 @@
       <div class="col">
         <div class="window purple-bg">
           Water lvl
-          <span id="wlvl">%</span>
+          <div style="display: flex;">
+            <span id="wlvl"></span>
+            <span>%</span> 
+          </div>
         </div>
       </div>
       <div class="col">
         <div class="window green-bg">
           pH
-          <span id="ph"></span>
+          <div style="display: flex;">
+            <span id="ph"></span>
+            <span>pH</span>
+          </div>
         </div>
       </div>
       <div class="col">
         <div class="window blue-bg">
           H2O2
-          <span id="h2O2"></span>
+          <div style="display: flex;">
+            <span id="h2O2"></span>
+            <span>?</span>
+          </div>
         </div>
       </div>
       <div class="col">
         <div class="window teal-bg">
           CO2
-          <span id="co">ppm</span>
+          <div style="display: flex;">
+            <span id="co"></span>
+            <span>ppm</span>
+          </div>
         </div>
       </div>
     </div>
@@ -125,25 +145,37 @@
       <div class="col">
         <div class="window red-bg">
           Water temp 1
-          <span id="wtemp1">C</span>
+          <div style="display: flex;">
+            <span id="wtemp1"></span>
+            <span>&#8451;</span>
+          </div>
         </div>
       </div>
       <div class="col">
         <div class="window yellow-bg">
           EC
-          <span id="EC">m^2/cm</span>
+          <div style="display: flex;">
+            <span id="EC"></span>
+            <span>µS/cm</span>
+          </div>
         </div>
       </div>
       <div class="col">
         <div class="window violet-bg">
           Air temp 1
-          <span id="atemp1">C</span>
+          <div style="display: flex;">
+            <span id="atemp1"></span>
+            <span>&#8451;</span>
+          </div>
         </div>
       </div>
       <div class="col">
         <div class="window pink-bg">
           RH1
-          <span id="rh1">%</span>
+          <div style="display: flex;">
+            <span id="rh1"></span>
+            <span>%</span>
+          </div>
         </div>
       </div>  
     </div>
@@ -151,31 +183,43 @@
       <div class="col">
         <div class="window orange-bg">
           Water temp 2
-          <span id="wtemp2">C</span>
+          <div style="display: flex;">
+            <span id="wtemp2"></span>
+            <span>&#8451;</span>
+          </div>
         </div>
       </div>
       <div class="col">
         <div class="window blue-bg">
           ORP
-          <span id="ORP">mV</span>
+          <div style="display: flex;">
+            <span id="ORP"></span>
+            <span>mV</span>
+          </div>
         </div>
       </div>
       <div class="col">
         <div class="window coral-bg">
           Air temp 2
-          <span id="atemp2">C</span>
+          <div style="display: flex;">
+            <span id="atemp2"></span>
+            <span>&#8451;</span> 
+          </div>
         </div>
       </div>
       <div class="col">
         <div class="window red-bg">
           RH2
-          <span id="rh2">%</span>
+          <div style="display: flex;">
+            <span id="rh2"></span>
+            <span>%</span>
+          </div>
         </div>
       </div>
     </div>
     <div class="row">
       <div class="window alerts alerts-bg">
-        Alerts -
+        Alerts:
         <span id="alerts"></span> 
       </div>
     </div>
@@ -251,7 +295,7 @@ function fetchAndUpdateValue() {
       }
       if (alerts) {
         if (arr[4] < 20){
-          alerts.textContent = ' Water level low'
+          alerts.textContent = 'Water level low'
         }
       }
     })
