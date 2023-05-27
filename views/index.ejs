@@ -209,47 +209,49 @@ function fetchAndUpdateValue() {
       const rh2 = document.getElementById('rh2')
       const alerts = document.getElementById('alerts')
 
-      const arr = data.split('&')
+      console.log(data.value)
+      const arr = data.value.split('&')
+      console.log(arr[0])
       
       if (wlvl) {
-        wlvl.textContent = arr[0]
+        wlvl.textContent = arr[4]
       }
       if (ph) {
-        ph.textContent = arr[1]
+        ph.textContent = arr[5]
       }
       if (h2O2) {
-        h2O2.textContent = arr[2]
+        h2O2.textContent = arr[6]
       }
       if (co) {
-        co.textContent = arr[3]
+        co.textContent = arr[7]
       }
       if (wtemp1) {
-        wtemp1.textContent = arr[4]
+        wtemp1.textContent = arr[8]
       }
       if (ec) {
-        ec.textContent = arr[5]
+        ec.textContent = arr[9]
       }
       if (atemp1) {
-        atemp1.textContent = arr[8]
+        atemp1.textContent = arr[0]
       }
       if (rh1) {
-        rh1.textContent = arr[10]
+        rh1.textContent = arr[2]
       }
       if (wtemp2) {
-        wtemp2.textContent = arr[6]
+        wtemp2.textContent = arr[10]
       }
       if (orp) {
-        orp.textContent = arr[7]
+        orp.textContent = arr[11]
       }
       if (atemp2) {
-        atemp2.textContent = arr[9]
+        atemp2.textContent = arr[1]
       }
       if (rh2) {
-        rh2.textContent = arr[11]
+        rh2.textContent = arr[3]
       }
       if (alerts) {
-        if (arr[0] < 20){
-          alerts.textContent = 'Water level low'
+        if (arr[4] < 20){
+          alerts.textContent = ' Water level low'
         }
       }
     })
@@ -260,7 +262,7 @@ function fetchAndUpdateValue() {
 
 document.addEventListener('DOMContentLoaded', function () {
   fetchAndUpdateValue();
-  setInterval(fetchAndUpdateValue, 500);
+  setInterval(fetchAndUpdateValue, 50);
 });
   </script>
 </body>
