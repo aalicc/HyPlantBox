@@ -13,7 +13,6 @@ const flash = require('express-flash')
 const session = require('express-session')
 const methodOverride = require('method-override')
 const bodyParser = require('body-parser')
-const db = require('./db/users')
 const {SerialPort} = require('serialport')
 const {ReadlineParser} = require('@serialport/parser-readline')
 const knex = require('./db/knex.js')
@@ -29,7 +28,7 @@ initializePassport(
 
 //variables
 let users = []
-let values
+let valuesCon
 
 //serial connection
 const port = new SerialPort({
@@ -48,8 +47,7 @@ port.open((err) => {
       port.pipe(parser)             //ALL VARIABLES NOT NEEDED, SPLITTING HAPPENS IN FRONT END SCRIPT
       // Read data from the serial port
       parser.on('data', (line) => { //async maybe?
-        console.log(line)
-        values = line
+        valuesCon = line
       })
 
       // Write data to the serial port //THE FORMAT IS CORRECT DO NOT CHANGE
@@ -90,7 +88,7 @@ app.get('/home', checkAuthenticated, (req, res) =>{
 })
 
 app.get('/login', async (req,res) =>{
-    users = await db.getAllUsers()
+    users = await knex.getAll(knex.usersdb, 'userCredentials')
     res.render('login.ejs')
 })
 
@@ -119,8 +117,13 @@ app.post('/register', async (req,res) => {
     }
 })
 
-app.get('/values', (req, res) => {
-    values = values + 
+app.get('/values', async (req, res) => {
+    let ruuvi1Q = await knex.ruuvidata('ruuvi1').max('time').select('Temp', 'Hum')
+    let ruuviProQ = await knex.ruuvidata('ruuviPro').max('time').select('Temp', 'Hum')
+    let ruuviValues = ruuvi1Q[0].Temp + '&' + ruuviProQ[0].Temp + 
+    '&' + ruuvi1Q[0].Hum + '&' + ruuviProQ[0].Hum + '&'
+    let values = ruuviValues.toString() + valuesCon.toString() 
+    console.log(values)
     const response = {
         value: values
     }
