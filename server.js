@@ -122,7 +122,10 @@ app.get('/values', async (req, res) => {
     let ruuviProQ = await knex.ruuvidata('ruuviPro').max('time').select('Temp', 'Hum')
     let ruuviValues = ruuvi1Q[0].Temp + '&' + ruuviProQ[0].Temp + 
     '&' + ruuvi1Q[0].Hum + '&' + ruuviProQ[0].Hum + '&'
-    let values = ruuviValues.toString() + valuesCon.toString() 
+    let values = ruuviValues.toString();
+    if (valuesCon !== undefined) {
+    values += valuesCon.toString();
+    } 
     console.log(values)
     const response = {
         value: values
