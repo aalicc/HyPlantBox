@@ -79,7 +79,7 @@ app.use(express.static(__dirname + '/views'))
 app.set('view engine', 'ejs')
 
 //rest
-app.get('/', (req, res) =>{
+app.get('/', checkNotAuthenticated,(req, res) =>{
     res.redirect('/login')
 })
 
@@ -87,12 +87,12 @@ app.get('/home', checkAuthenticated, (req, res) =>{
     res.render('index.ejs')
 })
 
-app.get('/login', async (req,res) =>{
+app.get('/login', checkNotAuthenticated, async (req,res) =>{
     users = await knex.getAll(knex.usersdb, 'userCredentials')
     res.render('login.ejs')
 })
 
-app.post('/login', passport.authenticate('local', {
+app.post('/login', checkNotAuthenticated, passport.authenticate('local', {
     successRedirect: '/home',
     failureRedirect: '/login',
     failureFlash: true
@@ -105,7 +105,7 @@ app.get('/register', (req,res) =>{
 app.post('/register', async (req,res) => {
     try {
         const hashedPassword = await bcrypt.hash(req.body.password, 10)
-        await db.createUser({
+        await knex.createThingy(knex.usersdb, 'userCredentials',{
             id: Date.now().toString(),
             name: req.body.name,
             email: req.body.email,
