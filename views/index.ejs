@@ -29,6 +29,7 @@
       /* CSS rules for small screens */
       body {
         font-size: 5vh;
+        font-family: 'Bahnschrift', sans-serif;
         color:aliceblue
       }
     }
@@ -38,6 +39,7 @@
       /* CSS rules for medium screens */
       body {
         font-size: 4vh;
+        font-family: 'Bahnschrift', sans-serif;
         color:aliceblue
       }
     }
@@ -47,6 +49,7 @@
       /* CSS rules for large screens */
       body {
         font-size: 2.6vh;
+        font-family: 'Bahnschrift', sans-serif;
         color:aliceblue
       }
     }
@@ -108,8 +111,8 @@
         <div class="window purple-bg">
           Water lvl
           <div style="display: flex;">
-            <span id="wlvl"></span>
-            <span>%</span> 
+            <span class="fs-1" id="wlvl"></span>
+            <span class="fs-1">%</span> 
           </div>
         </div>
       </div>
@@ -117,8 +120,8 @@
         <div class="window green-bg">
           pH
           <div style="display: flex;">
-            <span id="ph"></span>
-            <span>pH</span>
+            <span class="fs-1 id="ph"></span>
+            <span class="fs-1">pH</span>
           </div>
         </div>
       </div>
@@ -126,8 +129,8 @@
         <div class="window blue-bg">
           H2O2
           <div style="display: flex;">
-            <span id="h2O2"></span>
-            <span>?</span>
+            <span class="fs-1" id="h2O2"></span>
+            <span class="fs-1">?</span>
           </div>
         </div>
       </div>
@@ -135,8 +138,8 @@
         <div class="window teal-bg">
           CO2
           <div style="display: flex;">
-            <span id="co"></span>
-            <span>ppm</span>
+            <span class="fs-1" id="co"></span>
+            <span class="fs-1">ppm</span>
           </div>
         </div>
       </div>
@@ -146,8 +149,8 @@
         <div class="window red-bg">
           Water temp 1
           <div style="display: flex;">
-            <span id="wtemp1"></span>
-            <span>&#8451;</span>
+            <span class="fs-1" id="wtemp1"></span>
+            <span class="fs-1">&#8451;</span>
           </div>
         </div>
       </div>
@@ -155,8 +158,8 @@
         <div class="window yellow-bg">
           EC
           <div style="display: flex;">
-            <span id="EC"></span>
-            <span>µS/cm</span>
+            <span class="fs-1" id="EC"></span>
+            <span class="fs-1">µS/cm</span>
           </div>
         </div>
       </div>
@@ -164,8 +167,8 @@
         <div class="window violet-bg">
           Air temp 1
           <div style="display: flex;">
-            <span id="atemp1"></span>
-            <span>&#8451;</span>
+            <span class="fs-1" id="atemp1"></span>
+            <span class="fs-1">&#8451;</span>
           </div>
         </div>
       </div>
@@ -173,8 +176,8 @@
         <div class="window pink-bg">
           RH1
           <div style="display: flex;">
-            <span id="rh1"></span>
-            <span>%</span>
+            <span class="fs-1" id="rh1"></span>
+            <span class="fs-1">%</span>
           </div>
         </div>
       </div>  
@@ -184,8 +187,8 @@
         <div class="window orange-bg">
           Water temp 2
           <div style="display: flex;">
-            <span id="wtemp2"></span>
-            <span>&#8451;</span>
+            <span class="fs-1" id="wtemp2"></span>
+            <span class="fs-1">&#8451;</span>
           </div>
         </div>
       </div>
@@ -193,8 +196,8 @@
         <div class="window blue-bg">
           ORP
           <div style="display: flex;">
-            <span id="ORP"></span>
-            <span>mV</span>
+            <span class="fs-1" id="ORP"></span>
+            <span class="fs-1">mV</span>
           </div>
         </div>
       </div>
@@ -202,8 +205,8 @@
         <div class="window coral-bg">
           Air temp 2
           <div style="display: flex;">
-            <span id="atemp2"></span>
-            <span>&#8451;</span> 
+            <span class="fs-1" id="atemp2"></span>
+            <span class="fs-1">&#8451;</span> 
           </div>
         </div>
       </div>
@@ -211,15 +214,15 @@
         <div class="window red-bg">
           RH2
           <div style="display: flex;">
-            <span id="rh2"></span>
-            <span>%</span>
+            <span class="fs-1" id="rh2"></span>
+            <span class="fs-1">%</span>
           </div>
         </div>
       </div>
     </div>
     <div class="row">
-      <div class="window alerts alerts-bg">
-        Alerts:
+      <div class="window alerts alerts-bg fs-3" id="status">
+        Status:&nbsp;
         <span id="alerts"></span> 
       </div>
     </div>
@@ -295,8 +298,18 @@ function fetchAndUpdateValue() {
       }
       if (alerts) {
         if (arr[4] < 20){
-          alerts.textContent = 'Water level low'
+          alerts.textContent = ' Water level low HOUSTON WE HAVE A PROBLEM!!11'
+          document.getElementById('status').classList.add('alertsRed-bg') 
+        } else if (arr[4] > 90){
+          alerts.textContent = ' Water level high(potentially too high)'
+          document.getElementById('status').classList.add('alertsRed-bg') 
+        } else if (arr[4] == ''){
+          alerts.textContent = ' No data received from Controllino'
+          document.getElementById('status').classList.add('alertsRed-bg') 
+        } else {
+          alerts.textContent = ' No alerts'
         }
+
       }
     })
     .catch(error => {
