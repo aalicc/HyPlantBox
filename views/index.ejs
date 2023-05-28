@@ -256,9 +256,7 @@ function fetchAndUpdateValue() {
       const rh2 = document.getElementById('rh2')
       const alerts = document.getElementById('alerts')
 
-      console.log(data.value)
       const arr = data.value.split('&')
-      console.log(arr[0])
       
       if (wlvl) {
         wlvl.textContent = arr[4]
@@ -297,13 +295,13 @@ function fetchAndUpdateValue() {
         rh2.textContent = arr[3]
       }
       if (alerts) {
-        if (arr[4] < 20){
-          alerts.textContent = ' Water level low HOUSTON WE HAVE A PROBLEM!!11'
+        if (arr[4] < 20 && arr[4] != ''){
+          alerts.textContent = ' Water level low'
           document.getElementById('status').classList.add('alertsRed-bg') 
         } else if (arr[4] > 90){
           alerts.textContent = ' Water level high(potentially too high)'
           document.getElementById('status').classList.add('alertsRed-bg') 
-        } else if (arr[4] == ''){
+        } else if (!arr[4]){
           alerts.textContent = ' No data received from Controllino'
           document.getElementById('status').classList.add('alertsRed-bg') 
         } else {

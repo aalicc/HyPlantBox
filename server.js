@@ -44,13 +44,11 @@ port.open((err) => {
       console.error('Error opening port:', err.message)
     } else {
       console.log('Serial port opened.')
-      port.pipe(parser)             //ALL VARIABLES NOT NEEDED, SPLITTING HAPPENS IN FRONT END SCRIPT
+      port.pipe(parser)
       // Read data from the serial port
-      parser.on('data', (line) => { //async maybe?
+      parser.on('data', (line) => {
         valuesCon = line
       })
-
-      // Write data to the serial port //THE FORMAT IS CORRECT DO NOT CHANGE
       const sendData = 'Hello, Controllino!'
       port.write(sendData, (err) => {
         if (err) {
@@ -134,10 +132,10 @@ app.get('/values', async (req, res) => {
     res.json(response)
 })
 
-app.delete('/logout', (req, res) => {
+/*app.delete('/logout', (req, res) => {
     req.logOut()
-    res.redirect('/')
-})
+    res.redirect('/login')
+})*/
 
 function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {

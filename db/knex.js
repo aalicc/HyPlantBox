@@ -21,7 +21,6 @@ const ruuvidata = knex({
     }
 })
 
-//rebuild with arrow notation
 function createThingy(db, table, thingy){
     return db(table).insert(thingy)
 }
