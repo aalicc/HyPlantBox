@@ -120,7 +120,7 @@
         <div class="window green-bg">
           pH
           <div style="display: flex;">
-            <span class="fs-1 id="ph"></span>
+            <span class="fs-1" id="ph"></span>
             <span class="fs-1">pH</span>
           </div>
         </div>
@@ -129,8 +129,8 @@
         <div class="window blue-bg">
           H2O2
           <div style="display: flex;">
-            <span class="fs-1" id="h2O2"></span>
-            <span class="fs-1">?</span>
+            <span class="fs-1" id="h2o2"></span>
+            <span class="fs-1">ppm</span>
           </div>
         </div>
       </div>
@@ -244,7 +244,7 @@ function fetchAndUpdateValue() {
     .then(data => {
       const wlvl = document.getElementById('wlvl')
       const ph = document.getElementById('ph')
-      const h2O2 = document.getElementById('h2O 2')
+      const h2o2 = document.getElementById('h2o2')
       const co = document.getElementById('co')
       const wtemp1 = document.getElementById('wtemp1')
       const ec = document.getElementById('EC')
@@ -266,8 +266,8 @@ function fetchAndUpdateValue() {
       if (ph) {
         ph.textContent = arr[5]
       }
-      if (h2O2) {
-        h2O2.textContent = arr[6]
+      if (h2o2) {
+        h2o2.textContent = arr[6]
       }
       if (co) {
         co.textContent = arr[7]
@@ -307,6 +307,7 @@ function fetchAndUpdateValue() {
           alerts.textContent = ' No data received from Controllino'
           document.getElementById('status').classList.add('alertsRed-bg') 
         } else {
+          document.getElementById('status').classList.remove('alertsRed-bg') 
           alerts.textContent = ' No alerts'
         }
 
