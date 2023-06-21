@@ -1,21 +1,26 @@
 // Welcome to the ... project
 
-//----------------------LIBRARIES------------------------
+//-------------------------LIBRARIES---------------------------
 
 #include <Controllino.h>
 #include <SoftwareSerial.h> 
 #include <DFRobot_PH.h>
 #include <EEPROM.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
-//------------------------UART---------------------------
+//--------------------------PINOUT------------------------------
 
 //ORP -> X1
-SoftwareSerial mySerial4(53, 20);              
+//SoftwareSerial mySerial(53, 20);              
 
 //CO2 -> X1
 const byte modbus_serial = 50;                   //RS485
 
 //water level monitors -> X1
+/*const int echoPin[5] = {19, 4, 18, 5, 21};
+const int trigPin[5] = {2, 6, 3, 7, 51};
+*/
 const int echoPin_1 = 19;                        //1st water level sensor     
 const int trigPin_1 = 2;
 const int echoPin_2 = 4;                         //2nd                        
@@ -27,8 +32,8 @@ const int trigPin_4 = 7;
 const int echoPin_5 = 21;                        //5th
 const int trigPin_5 = 51;                   
 
-//water temperature -> X1
-const byte water_temp_pin = 21;                   
+//Water temperature -> X1
+const byte water_temp_pin = 53;                   
 
 //pH sensor -> X1
 const byte pH_pin = A1;
@@ -40,33 +45,42 @@ const byte tds_pin = A0;
 const byte buzzer_pin = 45;  
 
 //dosing pumps -> X2
-SoftwareSerial mySerial(13, 43);                 //1st dosing pump          
-SoftwareSerial mySerial1(11, 9);                 //2nd 
-SoftwareSerial mySerial2(12, 42);                //3rd 
-SoftwareSerial mySerial3(10, 8);                 //4th 
+SoftwareSerial mySerial1(13, 43);                   //1st dosing pump          
+SoftwareSerial mySerial2(11, 9);                    //2nd 
+//SoftwareSerial mySerial3(12, 42);                 //3rd 
+//SoftwareSerial mySerial4(10, 8);                  //4th 
 
 //Raspberry -> X1
 const byte raspi_serial = 1;           
 
-//-----------------------RELAYS--------------------------
+//--------------------------RELAYS-----------------------------
 
 //Fan -> Relay 0
 const byte fan_pin = 22;               
 
 //Main pump -> Relay 1
-const byte water_pump_pin = 23;          
+const byte main_pump_pin = 23;          
 
-//-----------------------CONFIG--------------------------
+//--------------------------CONFIG-----------------------------
 
-//water level meters
+//Water level indicators
 long duration;
-int distance;                                    
+int distance;                                  
 int av_dist;
 int water_lvl;
 
+/*long duration[5] = {1,2,3,4,5};
+int distance[5] = {1,2,3,4,5};                                    
+int av_dist[5] = {1,2,3,4,5};
+int water_lvl[5] = {1,2,3,4,5};*/
+
 //Temperature
-float temp_1;
-float temp_2;
+float temp_1, temp_2, av_temp;
+//OneWire settings
+OneWire oneWire(water_temp_pin);
+DallasTemperature sensors(&oneWire);
+uint8_t sensor1[8] = { 0x28, 0x7F, 0x17, 0xAC, 0x13, 0x19, 0x01, 0x9A };
+uint8_t sensor2[8] = { 0x28, 0xFF, 0xC8, 0xC2, 0xC1, 0x16, 0x04, 0xB5 };
 
 //pH sensor
 float voltage,phValue,temperature = 25;
@@ -76,31 +90,32 @@ DFRobot_PH ph;
 const float a = 0.020;
 float av_EC;
 
-//dosing pumps & ORP       
-String devicestring = "";                         
-String devicestring1 = "";                
-static unsigned long interval = 10000;           //interval between the 1st pump is on and off   
-static unsigned long interval1 = 5000;           //interval between the 2nd pump is on and off   
-unsigned long previous_millis = 0;               //timer for the 1st pump
-unsigned long previous_millis1 = 0;              //timer for the 2nd pump
+//Dosing pumps & ORP
+String devicestring1 = "";                         
+String devicestring2 = "";                
+static unsigned long interval_1 = 20000;              //interval between the 1st pump is on and off   
+static unsigned long interval_2 = 15000;              //interval between the 2nd pump is on and off   
+unsigned long previous_millis_1 = 0;                  //timer for the 1st pump
+unsigned long previous_millis_2 = 0;                  //timer for the 2nd pump
 
 //Raspberry
-String fromPi;
+String from_Pi;
 byte alarm_flag;
 
-//other
-boolean extra_disabled = false;
-
-//-----------------------MODBUS--------------------------
+//--------------------------MODBUS-----------------------------
 
 //vaisala stuff
 
-//-----------------------SETUP---------------------------
+//--------------------------SETUP------------------------------
 
 void setup() {
 
   //general
-  Serial.begin(19200);       
+  Serial.begin(19200);   
+  sensors.begin();
+
+  //ORP
+  //mySerial.begin(19200);    
        
   //water level & pH sensors
   pinMode(trigPin_1, OUTPUT); 
@@ -108,22 +123,20 @@ void setup() {
   ph.begin();
   
   //dosing pumps & ORP
-  mySerial.begin(19200);
-  mySerial1.begin(19200);        
-  mySerial2.begin(19200);
-  mySerial3.begin(19200);                    
-  devicestring.reserve(30);  
-  devicestring1.reserve(30);
-  devicestring2.reserve(30);  
-  devicestring3.reserve(30);
-
-  mySerial4.begin(19200);
+  mySerial1.begin(19200);
+  mySerial2.begin(19200);        
+  //mySerial3.begin(19200);
+  //mySerial4.begin(19200);                    
+  devicestring1.reserve(60);  
+  devicestring2.reserve(30);
+  //devicestring3.reserve(30);  
+  //devicestring4.reserve(30);
 
   //other
-  disable_extra();
+  //disable_extra();
 }
 
-//------------------------LOOP---------------------------
+//---------------------------LOOP------------------------------
 
 void loop(){
   stateMachine();
@@ -133,16 +146,22 @@ void stateMachine(){
     static unsigned long start_machine = millis();
 
     static unsigned long start_idle = 2000;
-    static unsigned long start_dose_pump = 3000;
-    static unsigned long start_water_level = 6000;
-    static unsigned long start_alarm = 7000;
-    static unsigned long start_pH = 8000;
+    static unsigned long start_water_level = 3000;
+    static unsigned long start_alarm = 4000;
+    //static unsigned long start_water_temp = 5000;
+    static unsigned long start_pH = 5000;
+    //static unsigned long start_EC = 4000;
+    //static unsigned long start_ORP = 4000;
+    //static unsigned long start_CO2 = 4000;
+    static unsigned long start_dose_pump = 6000;
+    //static unsigned long start_main_pump = 4000;
+    //static unsigned long start_fan = 4000;
 
     enum class controllinoState : uint8_t {
           IDLE,
           WATER_LEVEL,
           ALARM,
-          //TEMP,
+          //WATER,
           pH,
           //EC,
           //ORP,
@@ -175,12 +194,19 @@ switch (currentState) {
       if (millis() - start_machine >= start_alarm) {
         displayState("»»———-emergency state———-««");
         alarm();
-        currentState = controllinoState::pH;
+        currentState = controllinoState::pH; 
         
       }
       break;
 
-    //temperature state
+/*      case controllinoState::WATER_TEMP:  
+      if (millis() - start_machine >= start_water_temp) {
+        displayState("»»———-water t° state———-««");
+        water_temp();
+        currentState = controllinoState::pH;
+        
+      }
+      break;*/
 
       case controllinoState::pH:  
       if (millis() - start_machine >= start_pH) {
@@ -199,7 +225,7 @@ switch (currentState) {
         dose_pump();
         currentState = controllinoState::IDLE;
 
-        start_machine = millis();                    //RESET TIME LINE -> ALWAYS IN THE LAST STATE        
+        start_machine = millis();                        //Reset time line -> always in the last state       
       }
       break;          
 
@@ -222,82 +248,124 @@ void displayState(String currentState){
     }
 }
 
-//-------------SENSORS & MECHANICAL DEVICES--------------
+//------------------SENSORS & OUTPUT DEVICES-------------------
 
-//-------------------DFRobot SEN0208---------------------
+//----------------------DFRobot SEN0208------------------------
 
 void water_level(){
     float water_level_sum = 0; 
-    for (int i=0 ; i<10 ; i++){                     // 10 samples are taken for accuracy
-      digitalWrite(trigPin_1, LOW);                 // Clears the water_level_trig_pin condition first
+    for (int i=0 ; i<10 ; i++){                         
+      digitalWrite(trigPin_1, LOW);                     // Clears the trigPin condition first
       delayMicroseconds(2);
-      digitalWrite(trigPin_1, HIGH);                // Sets the water_level_trig_pin HIGH (ACTIVE) for 10 microseconds (time for 8 cycle sonic bursts)
+      digitalWrite(trigPin_1, HIGH);                    // Sets the water_level_trig_pin HIGH (ACTIVE) for 10 microseconds (time for 8 cycle sonic bursts)
       delayMicroseconds(10); 
       digitalWrite(trigPin_1, LOW);
-      duration = pulseIn(echoPin_1, HIGH);          // Reads the water_level_echo_pin, returns the sound wave travel time in microseconds
-      distance = duration * 0.034 / 2;              // Speed of sound wave divided by 2 (go and back)
+      duration = pulseIn(echoPin_1, HIGH);              // Reads the water_level_echo_pin, returns the sound wave travel time in microseconds
+      distance = duration * 0.034 / 2;                  // Speed of sound wave divided by 2 (go and back)
       water_level_sum = water_level_sum + distance;
       delay(20);
     }
-    av_dist = round(water_level_sum / 10.0);         // one average value of distance in cm
-    water_lvl = map(av_dist, 2, 24, 0, 100);        //(average distance, start cm, stop cm, start %, stop %)
+    av_dist = round(water_level_sum / 10.0);            
+    water_lvl = map(av_dist, 2, 24, 0, 100);            //(average distance, start cm, stop cm, start %, stop %)
     Serial.print("  Distance in cm: ");             
     Serial.print(av_dist);
     Serial.print("\n  Distance in %: ");  
     Serial.println(water_lvl);
 }
 
-//--------------------Buzzer-----------------------
+//-----------------------Buzzer---------------------------
 
 void alarm (){
   if ((water_lvl > 120)||(water_lvl < 20)){
     Serial.println("Check the water tanks ASAP!");
   }
+  else if((water_lvl <= 5)){
+    Serial.println("emergency");
+    }
+  else{
+    Serial.println("  OK");
+  }
 }
 
-//----------------DS18B20 One wire-----------------
+//--------------------DS18B20 One wire--------------------
 
+void water_temp(void){
+  sensors.requestTemperatures();
+  temp_1 = sensors.getTempC(sensor1);
+  Serial.println("  Temp1 (°C): " + (String)temp_1);
+  
+  temp_2 = sensors.getTempC(sensor2);
+  Serial.println("  Temp2 (°C): " + (String)temp_2);
 
+  av_temp = (temp_1 + temp_2)/2;
+}
 
-//----------------DFRobot pH V2.0------------------
+//---------------------DFRobot pH V2.0---------------------
 
 void pH_sensor(){
 
     static unsigned long timepoint = millis();
-    if(millis()-timepoint>1000U){                  //time interval: 1s
+    if(millis()-timepoint>1000U){                       //time interval: 1s
         timepoint = millis();
-        //temperature = readTemperature();         // read your temperature sensor to execute temperature compensation
-        voltage = analogRead(pH_pin)/1024.0*5000;  // read the voltage
-        phValue = ph.readPH(voltage,temperature);  // convert voltage to pH with temperature compensation
+        //temperature = readTemperature();              // read your temperature sensor to execute temperature compensation
+        voltage = analogRead(pH_pin)/1024.0*5000;       // read the voltage
+        phValue = ph.readPH(voltage,temperature);       // convert voltage to pH with temperature compensation
         //Serial.print("  temperature:");
         //Serial.print(temperature,1);
         Serial.print("  pH: ");
         Serial.println(phValue,2);
     }
-    ph.calibration(voltage,temperature);           // calibration process by Serail CMD
+    ph.calibration(voltage,temperature);                // calibration process by Serail CMD
 }
 
-//---------------------Grove TDS(EC)---------------------
+//------------------------Grove TDS(EC)------------------------
 
-//-----------------Atlas_Scientific_ORP------------------
+void EC_sensor (void){
 
-//-------------------Vaisala GMP252----------------------
+      int TDS_raw;
+      float voltage_EC;
+      float TDS_25;
+      float EC_25;
+      float EC_sum = 0;
+      float EC;
+      for (int i=0 ; i<5; i++){
+        TDS_raw = analogRead(tds_pin);
+        voltage_EC = TDS_raw*5/1024.0;                  
+        //voltage to TDS ->
+        TDS_25=(133.42*voltage_EC*voltage_EC*voltage_EC - 255.86*voltage_EC*voltage_EC + 857.39*voltage_EC)*0.5;
+        EC_25 = TDS_25*2;
+        EC = (1 + a*(av_temp - 25))*EC_25;               //temp compensation 
+        EC_sum = EC_sum + EC;                            //sum formula for the following average calculation
+        delay(10);
+      }
+      av_EC = EC_sum / 5; // average of 5 samples
+      Serial.print("  EC (uS): "); 
+      Serial.println(av_EC);
+}
 
-//-------------Atlas Scientific SGL-PMP-BX---------------
+//---------------------Atlas_Scientific_ORP--------------------
 
-void disable_extra(){                               //disables all extra responses
+
+
+//-----------------------Vaisala GMP252------------------------
+
+
+
+//------------------Atlas Scientific SGL-PMP-BX----------------
+
+void disable_extra(){                                     //disables all extra responses
 
 //mode with low power consumption 
-//mySerial.println("Sleep"); 
-//mySerial1.println("Sleep");
+//mySerial1.println("Sleep"); 
+//mySerial2.println("Sleep");
 
-mySerial.println("*OK,0"); 
-mySerial.println("C,0");
-mySerial.println("O,R,V,TV,ATV,0");
-
-mySerial1.println("*OK,0");
+mySerial1.println("*OK,0"); 
 mySerial1.println("C,0");
 mySerial1.println("O,R,V,TV,ATV,0");
+
+mySerial2.println("*OK,0");
+mySerial2.println("C,0");
+mySerial2.println("O,R,V,TV,ATV,0");
 
 Serial.println("configured!");
 
@@ -308,35 +376,63 @@ void dose_pump(){
  unsigned long current_millis = millis();
 
 //SEND COMMAND IN ASCII (STRING) 
-
-if (current_millis - previous_millis >= interval){     //pumps up water every n (interval) seconds
-  mySerial.println("status");
-  previous_millis = current_millis;
-}
-if (current_millis - previous_millis1 >= interval1){   //pumps up water every n (interval) seconds
+if (current_millis - previous_millis_1 >= interval_1){      //pumps up water every n (interval) seconds
   mySerial1.println("status");
-  previous_millis1 = current_millis;
+  previous_millis_1 = current_millis;
 }
-
+if (current_millis - previous_millis_2 >= interval_2){      //pumps up water every n (interval) seconds
+  mySerial2.println("status");
+  previous_millis_2 = current_millis;
+}
 //STRING READING
-
-if (mySerial.available() > 0){       
-    String inChar = mySerial.readStringUntil('\r');  
-    devicestring += inChar;   
-    Serial.println("  Status: " + (String)devicestring);          //adds text before "devicestring"
-    devicestring = "";          
+if (mySerial1.available() > 0){       
+    String inChar = mySerial1.readStringUntil('\r');  
+    devicestring1 += inChar;   
+    Serial.println("  Pump 1: " + (String)devicestring1);   //adds text before "devicestring1"
+    devicestring1 = "";          
     }
-    if (mySerial1.available() > 0) {                              // Data available on software serial port for Device 2
-    String inChar = mySerial1.readStringUntil('\r'); 
-    devicestring1 += inChar; 
-    Serial.println("  Status1: " + (String)devicestring1);         //adds text before "devicestring1"
-    devicestring1 = "";    
+    if (mySerial2.available() > 0) {                          // Data available on software serial port
+    String inChar = mySerial2.readStringUntil('\r'); 
+    devicestring2 += inChar; 
+    Serial.println("  Pump 2: " + (String)devicestring2);   //adds text before "devicestring2"
+    devicestring2 = "";    
     }
 }
+//STRING READING
+/*  if (mySerial1.available() > 0) {       
+    char inChar = mySerial1.read();      
+    devicestring1 += inChar;              
+    if (inChar == '\r') {                
+      sensor_string_complete_1 = true;      
+    }
+  }
+  if (sensor_string_complete_1) {
+    Serial.println("  Pump 1: ");
+    Serial.println(devicestring1);        
+    devicestring1 = "";                  
+    sensor_string_complete_1 = false;      
+  }
+  if (mySerial2.available() > 0) {       
+    char inChar = mySerial2.read();      
+    devicestring2 += inChar;              
+    if (inChar == '\r') {                
+      sensor_string_complete_2 = true;      
+    }
+  }
+  if (sensor_string_complete_2) {
+    Serial.println("  Pump 2: ");
+    Serial.println(devicestring2);        
+    devicestring2 = "";                  
+    sensor_string_complete_2 = false;      
+  }
+}*/
 
-//----------------------MAIN PUMP------------------------
 
-//-------------------------FAN---------------------------
+
+
+//-------------------------MAIN PUMP---------------------------
+
+//----------------------------FAN------------------------------
 
 
 
