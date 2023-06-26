@@ -51,7 +51,7 @@ SoftwareSerial mySerial2(11, 9);                    //2nd
 //SoftwareSerial mySerial4(10, 8);                  //4th 
 
 //Raspberry -> X1
-const byte raspi_serial = 1;           
+const byte raspi_serial = 1;        
 
 //--------------------------RELAYS-----------------------------
 
@@ -82,8 +82,8 @@ DallasTemperature sensors(&oneWire);
 uint8_t sensor1[8] = { 0x28, 0xFF, 0xC8, 0xC2, 0xC1, 0x16, 0x04, 0xB5 };
 
 //pH sensor
-float voltage,phValue,temperature = 25;
-DFRobot_PH ph;
+const float Offset = 0.4;                             //deviation compensate
+float av_ph;
 
 //EC sensor
 const float a = 0.020;
@@ -119,7 +119,6 @@ void setup() {
   //water level & pH sensors
   pinMode(trigPin_1, OUTPUT); 
   pinMode(echoPin_1, INPUT);
-  ph.begin();
   
   //dosing pumps & ORP
   mySerial1.begin(19200);
@@ -210,7 +209,7 @@ switch (currentState) {
       case controllinoState::pH:  
       if (millis() - start_machine >= start_pH) {
         displayState("»»———-pH level state———-««");
-        pH_sensor();
+          pH_level();
         currentState = controllinoState::DOSE_PUMPS;
       }
       break;
@@ -251,7 +250,7 @@ void displayState(String currentState){
 
 //----------------------DFRobot SEN0208------------------------
 
-void water_level(){
+void water_level(void){
     float water_level_sum = 0; 
     for (int i=0 ; i<10 ; i++){                         
       digitalWrite(trigPin_1, LOW);                     // Clears the trigPin condition first
@@ -274,7 +273,7 @@ void water_level(){
 
 //-----------------------Buzzer---------------------------
 
-void alarm (){
+void alarm (void){
   if ((water_lvl > 120)||(water_lvl < 20)){
     Serial.println("Check the water tanks ASAP!");
   }
@@ -296,20 +295,18 @@ void water_temp(void){
 
 //---------------------DFRobot pH V2.0---------------------
 
-void pH_sensor(){
-
-    static unsigned long timepoint = millis();
-    if(millis()-timepoint>1000U){                       //time interval: 1s
-        timepoint = millis();
-        //temperature = readTemperature();              // read your temperature sensor to execute temperature compensation
-        voltage = analogRead(pH_pin)/1024.0*5000;       // read the voltage
-        phValue = ph.readPH(voltage,temperature);       // convert voltage to pH with temperature compensation
-        //Serial.print("  temperature:");
-        //Serial.print(temperature,1);
-        Serial.print("  pH: ");
-        Serial.println(phValue,2);
-    }
-    ph.calibration(voltage,temperature);                // calibration process by Serail CMD
+void pH_level (void){
+  float ph_value, voltage, ph_raw, ph_sum = 0;
+  
+  for (int k=0; k<5; k++){
+    ph_raw = analogRead(pH_pin);
+    voltage = ph_raw*5/1024.0;
+    ph_value = 3.5*voltage+Offset;
+    ph_sum = ph_sum + ph_value;
+  }
+  av_ph = ph_sum / 5;
+  Serial.print("  pH value: ");
+  Serial.println(av_ph);
 }
 
 //------------------------Grove TDS(EC)------------------------
@@ -347,7 +344,7 @@ void EC_sensor (void){
 
 //------------------Atlas Scientific SGL-PMP-BX----------------
 
-void disable_extra(){                                     //disables all extra responses
+void disable_extra(void){                                     //disables all extra responses
 
 //mode with low power consumption 
 //mySerial1.println("Sleep"); 
@@ -365,7 +362,7 @@ Serial.println("configured!");
 
 }
 
-void dose_pump(){
+void dose_pump(void){
 
  unsigned long current_millis = millis();
 
