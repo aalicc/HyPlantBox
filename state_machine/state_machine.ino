@@ -18,8 +18,8 @@
 const byte modbus_serial = 50;                   //RS485
 
 //water level monitors -> X1
-/*const int echoPin[5] = {19, 4, 18, 5, 21};
-const int trigPin[5] = {2, 6, 3, 7, 51};
+/*const byte echoPin[] = {19, 4, 18, 5, 21};     //test new pin assignment
+const byte trigPin[] = {2, 6, 3, 7, 51};         
 */
 const int echoPin_1 = 19;                        //1st water level sensor     
 const int trigPin_1 = 2;
@@ -33,7 +33,7 @@ const int echoPin_5 = 21;                        //5th
 const int trigPin_5 = 51;                   
 
 //Water temperature -> X1
-const byte water_temp_pin = 53;                   
+const byte water_temp_pin = 21;                   
 
 //pH sensor -> X1
 const byte pH_pin = A1;
@@ -69,7 +69,7 @@ int distance;
 int av_dist;
 int water_lvl;
 
-/*long duration[5] = {1,2,3,4,5};
+/*long duration[5] = {1,2,3,4,5};                   
 int distance[5] = {1,2,3,4,5};                                    
 int av_dist[5] = {1,2,3,4,5};
 int water_lvl[5] = {1,2,3,4,5};*/
@@ -79,8 +79,7 @@ float temp_1, temp_2, av_temp;
 //OneWire settings
 OneWire oneWire(water_temp_pin);
 DallasTemperature sensors(&oneWire);
-uint8_t sensor1[8] = { 0x28, 0x7F, 0x17, 0xAC, 0x13, 0x19, 0x01, 0x9A };
-uint8_t sensor2[8] = { 0x28, 0xFF, 0xC8, 0xC2, 0xC1, 0x16, 0x04, 0xB5 };
+uint8_t sensor1[8] = { 0x28, 0xFF, 0xC8, 0xC2, 0xC1, 0x16, 0x04, 0xB5 };
 
 //pH sensor
 float voltage,phValue,temperature = 25;
@@ -148,12 +147,12 @@ void stateMachine(){
     static unsigned long start_idle = 2000;
     static unsigned long start_water_level = 3000;
     static unsigned long start_alarm = 4000;
-    //static unsigned long start_water_temp = 5000;
-    static unsigned long start_pH = 5000;
+    static unsigned long start_water_temp = 5000;
+    static unsigned long start_pH = 6000;
     //static unsigned long start_EC = 4000;
     //static unsigned long start_ORP = 4000;
     //static unsigned long start_CO2 = 4000;
-    static unsigned long start_dose_pump = 6000;
+    static unsigned long start_dose_pump = 7000;
     //static unsigned long start_main_pump = 4000;
     //static unsigned long start_fan = 4000;
 
@@ -161,7 +160,7 @@ void stateMachine(){
           IDLE,
           WATER_LEVEL,
           ALARM,
-          //WATER,
+          WATER_TEMP,
           pH,
           //EC,
           //ORP,
@@ -194,19 +193,19 @@ switch (currentState) {
       if (millis() - start_machine >= start_alarm) {
         displayState("»»———-emergency state———-««");
         alarm();
-        currentState = controllinoState::pH; 
+        currentState = controllinoState::WATER_TEMP; 
         
       }
       break;
 
-/*      case controllinoState::WATER_TEMP:  
+      case controllinoState::WATER_TEMP:  
       if (millis() - start_machine >= start_water_temp) {
         displayState("»»———-water t° state———-««");
         water_temp();
         currentState = controllinoState::pH;
         
       }
-      break;*/
+      break;
 
       case controllinoState::pH:  
       if (millis() - start_machine >= start_pH) {
@@ -293,11 +292,6 @@ void water_temp(void){
   sensors.requestTemperatures();
   temp_1 = sensors.getTempC(sensor1);
   Serial.println("  Temp1 (°C): " + (String)temp_1);
-  
-  temp_2 = sensors.getTempC(sensor2);
-  Serial.println("  Temp2 (°C): " + (String)temp_2);
-
-  av_temp = (temp_1 + temp_2)/2;
 }
 
 //---------------------DFRobot pH V2.0---------------------
