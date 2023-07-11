@@ -132,6 +132,10 @@ app.get('/values', async (req, res) => {
     res.json(response)
 })
 
+app.get('/control', async (req,res) => {
+    res.render('control.ejs')
+})
+
 /*app.delete('/logout', (req, res) => {
     req.logOut()
     res.redirect('/login')
