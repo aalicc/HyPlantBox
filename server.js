@@ -2,7 +2,7 @@ if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config()
 }
 
-//FYI CHANGE RASPBERRY PI SERIAL CONFIG SETTINGS
+//CHANGE RASPBERRY PI SERIAL CONFIG SETTINGS BEFORE RUNNING
 
 //packages
 const express = require('express')
@@ -32,7 +32,7 @@ let valuesCon
 
 //serial connection
 const port = new SerialPort({
-    path:'/dev/ttyS0', //try connecting via pins
+    path:'COM3', //try connecting via pins
     baudRate: 19200,
     autoOpen: false
 })
