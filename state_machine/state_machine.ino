@@ -6,6 +6,8 @@
 #include <SoftwareSerial.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include "DFRobot_PH.h"
+#include <EEPROM.h>
 
 //--------------------------PINOUT------------------------------
 
@@ -32,12 +34,11 @@ const byte modbus_pin = 50;                 //RS485
 
 //pH sensor -> X1
 const byte pH_pin = A1;
+float pH_voltage, pH_compensated;
+DFRobot_PH ph;
 
 //TDS sensor -> X1                          //mentined later as EC sensor
 const byte TDS_pin = A0;
-
-//ORP -> X1
-#define mySerial Serial1                    //hardware serial port
 
 //Dosing pumps -> X2 
 SoftwareSerial mySerial1(13, 43);           //1st dosing pump
@@ -47,7 +48,7 @@ SoftwareSerial mySerial2(11, 9);            //2nd
 
 //fan
 int fan_speed;
-//fan control PCB HW-095
+//fan control HW-095
 int fan_control_IN2_pin = 4;               //clockwise rotation pin
 int fan_control_ENA_pin = 2;
 
@@ -62,6 +63,7 @@ const byte dose_pump_12V_pin_2 = 24;
 
 //Fan -> Relay 0
 const byte fan_pin_1 = 22;
+//const byte fan_pin_2 = 
 
 //Main pump -> Relay 8
 const byte main_pump_pin = 30;
@@ -82,20 +84,9 @@ DallasTemperature sensors(&oneWire);
 uint8_t sensor1[8] = { 0x28, 0x77, 0x07, 0x97, 0x94, 0x07, 0x03, 0x0F };
 //uint8_t sensor2[8] = { 0x28, 0x83, 0x53, 0x97, 0x94, 0x13, 0x03, 0xFC };
 
-//pH sensor
-const float Offset = 0.4;                   //deviation compensate
-float pH_average;
-
 //EC sensor
 const float a = 0.020;
 float EC_average;
-
-//ORP sensor
-String inputstring = "";                     //a string to hold incoming data from the PC
-String sensorstring = "";                    //a string to hold the data from the Atlas Scientific product
-boolean input_string_complete = false;       //have we received all the data from the PC
-boolean sensor_string_complete = false;      //have we received all the data from the Atlas Scientific product
-float ORP;  
 
 //Dosing pumps
 String devicestring = "";
@@ -116,14 +107,12 @@ void setup() {
   Serial.begin(19200);
   sensors.begin();
 
-  //ORP
-  mySerial.begin(19200);
-  inputstring.reserve(10);                            
-  sensorstring.reserve(30);
-
   //water level
   pinMode(trig_pin_1, OUTPUT);
   pinMode(echo_pin_1, INPUT);
+
+  //pH level
+  ph.begin();
 
   //dosing pumps
   pinMode(dose_pump_12V_pin_1, OUTPUT);
@@ -158,16 +147,15 @@ void stateMachine() {
   static unsigned long start_temp = 5000;
   static unsigned long start_pH = 6000;
   static unsigned long start_EC = 7000;
-  static unsigned long start_ORP = 8000;
   //static unsigned long start_CO2 = 4000;
-  static unsigned long start_dose_pump_1 = 9000;
-  static unsigned long start_dose_pump_2 = 10000;
+  static unsigned long start_dose_pump_1 = 8000;
+  static unsigned long start_dose_pump_2 = 9000;
   //static unsigned long start_dose_pump_3 = 7000;
   //static unsigned long start_dose_pump_4 = 9000;
   //static unsigned long start_main_pump = 4000;
-  static unsigned long start_fan_1 = 11000;
+  static unsigned long start_fan_1 = 10000;
   //static unsigned long start_fan_2 = 13000;
-  static unsigned long start_off = 15000;
+  static unsigned long start_off = 14000;
 
   enum class controllinoState : uint8_t {
     IDLE,
@@ -176,7 +164,6 @@ void stateMachine() {
     WATER_TEMP,
     pH,
     EC,
-    //ORP,
     //CO2,
     DOSE_PUMP_1,
     DOSE_PUMP_2,
@@ -237,15 +224,6 @@ void stateMachine() {
         currentState = controllinoState::DOSE_PUMP_1;
       }
       break;
-
- /*   case controllinoState::ORP:
-      if (millis() - start_machine >= start_ORP) {
-        displayState("»»———-ORP state———-««");
-        serialEvent();
-        ORP_level();
-        currentState = controllinoState::DOSE_PUMP_1;
-      }
-      break;*/
 
     case controllinoState::DOSE_PUMP_1:
       if (millis() - start_machine >= start_dose_pump_1) {
@@ -323,9 +301,8 @@ float EC_up_dosage = 5;
 float EC_down_dosage =5;
 //fan default speed  0% - 100%
 int fan_speed_pct = 0; 
-//fan speed when CO2 rises
-
-
+//fan speed if CO2 too high
+int fan_speed_pct_CO2 = 100;
 
 //------------------SENSORS & OUTPUT DEVICES-------------------
 
@@ -374,19 +351,15 @@ void water_temp(void) {
   Serial.println("  Temp1 (°C): " + (String)temperature_C);
 }
 
-//--------------------DFRobot pH V1.1----------------------
+//--------------------DFRobot pH V2.0----------------------
 
 void pH_level(void) {
-  float pH_value, voltage, pH_raw, pH_sum = 0;
-
-  for (int k = 0; k < 5; k++) {
-    pH_raw = analogRead(pH_pin);
-    voltage = pH_raw * 5 / 1024.0;
-    pH_value = 3.5 * voltage + Offset;
-    pH_sum = pH_sum + pH_value;
-  }
-  pH_average = pH_sum / 5;
-  Serial.println("  pH value: " + (String)pH_average);
+  pH_voltage = analogRead(pH_pin)/1024.0*5000;            // read the voltage
+  pH_compensated = ph.readPH(pH_voltage,temperature_C);  // convert voltage to pH with temperature compensation
+  //Serial.print("temperature:");
+  //Serial.print(temperature_C,1);
+  Serial.print("  pH: ");
+  Serial.println((pH_compensated),2);             
 }
 
 //-----------------------Grove TDS------------------------
@@ -408,34 +381,6 @@ void EC_level(void) {
   Serial.println("  EC (mS/m): " + (String)EC_average);
 }
 
-//----------------Atlas Scientific EZO-ORP----------------
-
-void serialEvent() {                                  //if the hardware serial port_0 receives a char
-  inputstring = Serial.readStringUntil(13);           //read the string until we see a <CR>
-  input_string_complete = true;                       //set the flag used to tell if we have received a completed string from the PC
-}
-
-void ORP_level(){
-  if (input_string_complete == true) {                //if a string from the PC has been received in its entirety
-    mySerial.print(inputstring);                      //send that string to the Atlas Scientific product
-    mySerial.print('\r');                             //add a <CR> to the end of the string
-    inputstring = "";                                 //clear the string
-    input_string_complete = false;                    //reset the flag used to tell if we have received a completed string from the PC
-  }
-  if (mySerial.available() > 0) {                     //if we see that the Atlas Scientific product has sent a character
-    char inchar = (char)mySerial.read();              //get the char we just received
-    sensorstring += inchar;                           //add the char to the var called sensorstring
-    if (inchar == '\r') {                             //if the incoming character is a <CR>
-      sensor_string_complete = true;                  //set the flag
-    }
-  }
-  if (sensor_string_complete == true) {               //if a string from the Atlas Scientific product has been received in its entirety
-    Serial.println(sensorstring);                     //send that string to the PC's serial monitor
-    sensorstring = "";                                //clear the string
-    sensor_string_complete = false;                   //reset the flag used to tell if we have received a completed string from the Atlas Scientific product
-  }
-}
-
 //-----------------------Vaisala GMP252------------------------
 
 
@@ -443,7 +388,7 @@ void ORP_level(){
 //------------------Atlas Scientific SGL-PMP-BX----------------
 
 void dose_pump_pH_up(void) {                               //pump 1
-if (pH_average < pH_lowest){
+if (pH_compensated < pH_lowest){
   //SEND COMMAND IN ASCII (STRING)
   mySerial1.println("d,"+ (String)pH_up_dosage);           //dispose x milliliters -> D,X 
   Serial.println("  Pump 1 is rising the pH...");
@@ -470,12 +415,20 @@ if (EC_average < pH_highest){
     mySerial3.println("d," + (String)pH_down_dosage);
     Serial.println("Pump 3 is lowering the pH...")
   }
+    else{
+    mySerial3.println("d,Sleep");                          //enter low power mode
+    Serial.println("  Pump 3 is sleeping...");
+  }
 }
 void dose_pump_EC_down(void) {                             //pump 4
 if (EC_average > EC_highest){
   //SEND COMMAND IN ASCII (STRING)
     mySerial4.println("d," + (String)EC_down_dosage);
     Serial.println("Pump 4 is lowering the EC...")
+  }
+    else{
+    mySerial4.println("d,Sleep");                          //enter low power mode
+    Serial.println("  Pump 4 is sleeping...");
   }
 }*/
 
@@ -486,7 +439,7 @@ if (EC_average > EC_highest){
 //---------------------------FANS------------------------------
 
 void fan() {
-  fan_speed = map(fan_speed_pct, 0, 100, 0, 255);              //convert % to the actual speed value
+  fan_speed = map(fan_speed_pct, 0, 100, 0, 255);               //convert % to the actual speed value
 
   if (fan_speed_pct > 0 && fan_speed_pct < 100){
     digitalWrite(fan_control_IN2_pin, HIGH); 
@@ -503,6 +456,14 @@ void fan() {
     analogWrite(fan_control_ENA_pin, fan_speed );
     Serial.println("Fan's limit is 100%");
   }
+
+//CO2 CONTROL
+/*  if (CO2_level > 800){                                        //if CO2 value exceeeds the limit
+    fan_speed = map(fan_speed_pct_CO2, 0, 100, 0, 255);     
+    digitalWrite(fan_control_IN2_pin, HIGH); 
+    analogWrite(fan_control_ENA_pin, fan_speed );
+  }*/
+
 }
 
 
