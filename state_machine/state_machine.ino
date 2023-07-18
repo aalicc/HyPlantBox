@@ -176,7 +176,7 @@ void stateMachine() {
     WATER_TEMP,
     pH,
     EC,
-    ORP,
+    //ORP,
     //CO2,
     DOSE_PUMP_1,
     DOSE_PUMP_2,
@@ -185,7 +185,6 @@ void stateMachine() {
     //MAIN_PUMP,
     FAN_1,
     //FAN_2;
-    OFF,
   };
 
   static controllinoState currentState = controllinoState::IDLE;
@@ -235,18 +234,19 @@ void stateMachine() {
       if (millis() - start_machine >= start_EC) {
         displayState("»»———-EC state———-««");
         EC_level();
-        currentState = controllinoState::ORP;
+        currentState = controllinoState::DOSE_PUMP_1;
       }
       break;
 
-    case controllinoState::ORP:
+ /*   case controllinoState::ORP:
       if (millis() - start_machine >= start_ORP) {
         displayState("»»———-ORP state———-««");
         serialEvent();
         ORP_level();
         currentState = controllinoState::DOSE_PUMP_1;
       }
-      break;
+      break;*/
+
     case controllinoState::DOSE_PUMP_1:
       if (millis() - start_machine >= start_dose_pump_1) {
         displayState("»»———-1st dosing pump state———-««");
@@ -285,18 +285,9 @@ void stateMachine() {
       if (millis() - start_machine >= start_fan_1) {
         displayState("»»———-fan state———-««");
         fan();
-        currentState = controllinoState::OFF;
-      }
-      break;
-
-      case controllinoState::OFF:
-      if (millis() - start_machine >= start_off) {
-        displayState("»»———-OFF———-««");
-        digitalWrite(fan_pin_1, LOW);
         currentState = controllinoState::IDLE;
-        
-      //Reset time line -> always in the last state
-      start_machine = millis();                        
+
+        start_machine = millis();  
       }
       break;
 
@@ -331,7 +322,7 @@ float pH_down_dosage = 5;
 float EC_up_dosage = 5;
 float EC_down_dosage =5;
 //fan default speed  0% - 100%
-int fan_speed_pct = 100; 
+int fan_speed_pct = 0; 
 //fan speed when CO2 rises
 
 
@@ -457,12 +448,20 @@ if (pH_average < pH_lowest){
   mySerial1.println("d,"+ (String)pH_up_dosage);           //dispose x milliliters -> D,X 
   Serial.println("  Pump 1 is rising the pH...");
   }
+  else{
+    mySerial1.println("d,Sleep");                          //enter low power mode
+    Serial.println("  Pump 1 is sleeping...");
+  }
 }
 void dose_pump_EC_up(void) {                               //pump 2
 if (EC_average < EC_lowest){
   //SEND COMMAND IN ASCII (STRING)
     mySerial2.println("d," + (String)EC_up_dosage);
     Serial.println("  Pump 2 is rising the EC...");
+  }
+  else{
+    mySerial2.println("d,Sleep");                          //enter low power mode
+    Serial.println("  Pump 2 is sleeping...");
   }
 }
 /*void dose_pump_pH_down(void) {                           //pump 3
@@ -488,9 +487,22 @@ if (EC_average > EC_highest){
 
 void fan() {
   fan_speed = map(fan_speed_pct, 0, 100, 0, 255);              //convert % to the actual speed value
-  digitalWrite(fan_control_IN2_pin, HIGH); 
-  analogWrite(fan_control_ENA_pin, fan_speed );
-  Serial.println("  Fan speed set on " + (String)fan_speed_pct);
+
+  if (fan_speed_pct > 0 && fan_speed_pct < 100){
+    digitalWrite(fan_control_IN2_pin, HIGH); 
+    analogWrite(fan_control_ENA_pin, fan_speed );
+    Serial.println("  Fan speed set on " + (String)fan_speed_pct);
+  }
+  else if (fan_speed_pct <= 0){
+    digitalWrite(fan_control_IN2_pin, LOW); 
+    Serial.println("  Fan OFF");
+  }
+  else{                                                    
+    fan_speed = 255;
+    digitalWrite(fan_control_IN2_pin, HIGH); 
+    analogWrite(fan_control_ENA_pin, fan_speed );
+    Serial.println("Fan's limit is 100%");
+  }
 }
 
 
