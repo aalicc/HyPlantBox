@@ -9,6 +9,7 @@
 #include "DFRobot_PH.h"
 #include <EEPROM.h>
 
+
 //--------------------------PINOUT------------------------------
 
 //Water level -> X1
@@ -88,9 +89,6 @@ uint8_t sensor1[8] = { 0x28, 0x77, 0x07, 0x97, 0x94, 0x07, 0x03, 0x0F };
 const float a = 0.020;
 float EC_average;
 
-//Dosing pumps
-String devicestring = "";
-
 //Raspberry Pi
 String from_Pi;
 byte alarm_flag;
@@ -123,13 +121,14 @@ void setup() {
   mySerial2.begin(19200);
   //mySerial3.begin(19200);
   //mySerial4.begin(19200);
-  devicestring.reserve(60);
 
   //fan
-  pinMode(fan_pin_1, OUTPUT);  
   pinMode(fan_control_IN2_pin, OUTPUT);                     
   pinMode(fan_control_ENA_pin, OUTPUT);  
   digitalWrite(fan_control_IN2_pin, LOW);
+
+  //main pump
+ // pinMode(main_pump_pin,OUTPUT);
 }
 
 //---------------------------LOOP------------------------------
@@ -150,12 +149,11 @@ void stateMachine() {
   //static unsigned long start_CO2 = 4000;
   static unsigned long start_dose_pump_1 = 8000;
   static unsigned long start_dose_pump_2 = 9000;
-  //static unsigned long start_dose_pump_3 = 7000;
-  //static unsigned long start_dose_pump_4 = 9000;
+  static unsigned long start_dose_pump_3 = 10000;
+  static unsigned long start_dose_pump_4 = 11000;
   //static unsigned long start_main_pump = 4000;
-  static unsigned long start_fan_1 = 10000;
+  static unsigned long start_fan_1 = 12000;
   //static unsigned long start_fan_2 = 13000;
-  static unsigned long start_off = 14000;
 
   enum class controllinoState : uint8_t {
     IDLE,
@@ -167,8 +165,8 @@ void stateMachine() {
     //CO2,
     DOSE_PUMP_1,
     DOSE_PUMP_2,
-    //DOSE_PUMP_3,
-    //DOSE_PUMP_4,
+    DOSE_PUMP_3,
+    DOSE_PUMP_4,
     //MAIN_PUMP,
     FAN_1,
     //FAN_2;
@@ -237,10 +235,10 @@ void stateMachine() {
       if (millis() - start_machine >= start_dose_pump_2) {
         displayState("»»———-2nd dosing pump state———-««");
         dose_pump_EC_up();
-        currentState = controllinoState::FAN_1;
+        currentState = controllinoState::DOSE_PUMP_3;
       }
       break;
-/*
+
     case controllinoState::DOSE_PUMP_3:
       if (millis() - start_machine >= start_dose_pump_3) {
         displayState("»»———-3rd dosing pump state———-««");
@@ -256,7 +254,7 @@ void stateMachine() {
         currentState = controllinoState::FAN_1;
       }
       break;
-*/
+
       //Main pump state
 
       case controllinoState::FAN_1:
@@ -273,7 +271,7 @@ void stateMachine() {
 
     default:
       // Nothing to do here
-      Serial.println("'Default' Switch Case reached - Error");
+      Serial.println("ERROR");
   }
 }
 
@@ -355,27 +353,27 @@ void water_temp(void) {
 
 void pH_level(void) {
   pH_voltage = analogRead(pH_pin)/1024.0*5000;            // read the voltage
-  pH_compensated = ph.readPH(pH_voltage,temperature_C);  // convert voltage to pH with temperature compensation
+  pH_compensated = ph.readPH(pH_voltage,temperature_C);   // convert voltage to pH with temperature compensation
   //Serial.print("temperature:");
   //Serial.print(temperature_C,1);
   Serial.print("  pH: ");
-  Serial.println((pH_compensated),2);             
+  Serial.println(pH_compensated,2);             
 }
 
 //-----------------------Grove TDS------------------------
 
 void EC_level(void) {
   int TDS_raw;
-  float voltage_EC = 0, TDS_25 = 0, EC_25, EC_sum = 0, EC;
+  float EC_voltage = 0, TDS_25 = 0, EC_25, EC_sum = 0, EC;
   for (int i = 0; i < 5; i++) {
     TDS_raw = analogRead(TDS_pin);
-    voltage_EC = TDS_raw * 5 / 1024.0;
+    EC_voltage = TDS_raw * 5 / 1024.0;
     //voltage to TDS ->
-    TDS_25 = (133.42 * voltage_EC * voltage_EC * voltage_EC - 255.86 * voltage_EC * voltage_EC + 857.39 * voltage_EC) * 0.5;
+    TDS_25 = (133.42 * EC_voltage * EC_voltage * EC_voltage - 255.86 * EC_voltage * EC_voltage + 857.39 * EC_voltage) * 0.5;
+    //TDS to EC ->
     EC_25 = TDS_25 * 2;
     EC = (1 + a * (temperature_C - 25)) * EC_25;           //t° compensation
     EC_sum = EC_sum + EC;                                  //sum for the following average calculation
-    delay(10);
   }
   EC_average = EC_sum / 5;                                 
   Serial.println("  EC (mS/m): " + (String)EC_average);
@@ -391,7 +389,7 @@ void dose_pump_pH_up(void) {                               //pump 1
 if (pH_compensated < pH_lowest){
   //SEND COMMAND IN ASCII (STRING)
   mySerial1.println("d,"+ (String)pH_up_dosage);           //dispose x milliliters -> D,X 
-  Serial.println("  Pump 1 is rising the pH...");
+  Serial.println("  Pump 1 is raising the pH...");
   }
   else{
     mySerial1.println("d,Sleep");                          //enter low power mode
@@ -402,39 +400,41 @@ void dose_pump_EC_up(void) {                               //pump 2
 if (EC_average < EC_lowest){
   //SEND COMMAND IN ASCII (STRING)
     mySerial2.println("d," + (String)EC_up_dosage);
-    Serial.println("  Pump 2 is rising the EC...");
+    Serial.println("  Pump 2 is raising the EC...");
   }
   else{
     mySerial2.println("d,Sleep");                          //enter low power mode
     Serial.println("  Pump 2 is sleeping...");
   }
 }
-/*void dose_pump_pH_down(void) {                           //pump 3
+void dose_pump_pH_down(void) {                           //pump 3
 if (EC_average < pH_highest){
   //SEND COMMAND IN ASCII (STRING)
-    mySerial3.println("d," + (String)pH_down_dosage);
-    Serial.println("Pump 3 is lowering the pH...")
+    //mySerial3.println("d," + (String)pH_down_dosage);
+    Serial.println("  Pump 3 is lowering the pH...");
   }
     else{
-    mySerial3.println("d,Sleep");                          //enter low power mode
+    //mySerial3.println("d,Sleep");                          //enter low power mode
     Serial.println("  Pump 3 is sleeping...");
   }
 }
 void dose_pump_EC_down(void) {                             //pump 4
 if (EC_average > EC_highest){
   //SEND COMMAND IN ASCII (STRING)
-    mySerial4.println("d," + (String)EC_down_dosage);
-    Serial.println("Pump 4 is lowering the EC...")
+    //mySerial4.println("d," + (String)EC_down_dosage);
+    Serial.println("  Pump 4 is lowering the EC...");
   }
     else{
-    mySerial4.println("d,Sleep");                          //enter low power mode
+    //mySerial4.println("d,Sleep");                          //enter low power mode
     Serial.println("  Pump 4 is sleeping...");
   }
-}*/
+}
 
 //----------------------MAIN WATER PUMP------------------------
 
+/*digitalWrite(main_pump_pin,HIGH);
 
+*/
 
 //---------------------------FANS------------------------------
 
@@ -458,7 +458,7 @@ void fan() {
   }
 
 //CO2 CONTROL
-/*  if (CO2_level > 800){                                        //if CO2 value exceeeds the limit
+/*  if (CO2_level < 800){                                        //if CO2 value too low
     fan_speed = map(fan_speed_pct_CO2, 0, 100, 0, 255);     
     digitalWrite(fan_control_IN2_pin, HIGH); 
     analogWrite(fan_control_ENA_pin, fan_speed );
