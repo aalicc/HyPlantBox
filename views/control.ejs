@@ -10,20 +10,21 @@
   <body>
     <div class="container-fluid">
       <div class="row">
-        <div class="col-4">
-          <label for="rangeInput1" class="form-label">Fan speed</label>
-          <input type="range" class="form-range" min="0" max="100" step="10" id="rangeInput1">
+        <div class="col-4 m-3">
+          <label for="fanspeed" class="form-label">Fan speed</label>
+          <input type="range" class="form-range" min="0" max="100" step="10" id="fanspeed" name="fanspeed">
           <input type="text" class="form-control" id="textInput1" value="">
         </div>
       </div>
       <div class="row">
-        <div class="col-8"> <!-- Needs js here to work as intended -->
-          <input type="text" class="form-control" id="pump1" placeholder="Needed solution amount in ml" value=""> 
-          <input type="text" class="form-control" id="pump2" placeholder="Needed solution amount in ml" value=""> 
-          <input type="text" class="form-control" id="pump3" placeholder="Needed solution amount in ml" value=""> 
-          <input type="text" class="form-control" id="pump4" placeholder="Needed solution amount in ml" value="">
+        <div class="col-6 ms-2"> <!-- Needs js here to work as intended -->
+          <input type="text" class="form-control m-2" id="pump1" placeholder="Needed solution amount in ml" value=""> 
+          <input type="text" class="form-control m-2" id="pump2" placeholder="Needed solution amount in ml" value=""> 
+          <input type="text" class="form-control m-2" id="pump3" placeholder="Needed solution amount in ml" value=""> 
+          <input type="text" class="form-control m-2" id="pump4" placeholder="Needed solution amount in ml" value="">
         </div>
       </div>
+      <button class="m-3 btn btn-lg btn-primary" type="submit">Save</button>
     </div>
     </body>
 </form>

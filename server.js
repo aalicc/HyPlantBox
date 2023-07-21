@@ -32,7 +32,7 @@ let valuesCon
 
 //serial connection
 const port = new SerialPort({
-    path:'COM3', //try connecting via pins
+    path:'/dev/ttyS0', //try connecting via pins
     baudRate: 19200,
     autoOpen: false
 })
@@ -132,8 +132,26 @@ app.get('/values', async (req, res) => {
     res.json(response)
 })
 
-app.get('/control', async (req,res) => {
+app.get('/control', (req,res) => {
     res.render('control.ejs')
+})
+
+app.post('/control', async (req,res) => {
+    try{
+        let fanspeed = req.body.fanspeed
+        port.write(fanspeed, (err) => {
+            if (err) {
+                console.log('Didnt work')
+            }
+            else {
+                console.log('Succccess')
+                window.alert('Data sent!')
+            }
+        })
+    }
+    catch{
+        res.redirect('/control')
+    }
 })
 
 /*app.delete('/logout', (req, res) => {
