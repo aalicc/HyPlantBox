@@ -3,25 +3,25 @@
 //-------------------------LIBRARIES----------------------------
 
 #include <Controllino.h>
+#include <SPI.h>
 #include <SoftwareSerial.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include "DFRobot_PH.h"
 #include <EEPROM.h>
 
-
 //--------------------------PINOUT------------------------------
 
 //Water level -> X1
-const int echo_pin_1 = 3;                   //1st water level sensor
+const int echo_pin_1 = 3;                         //1st water level sensor
 const int trig_pin_1 = 5;
-const int echo_pin_2 = 7;                   //2nd
+const int echo_pin_2 = 7;                         //2nd
 const int trig_pin_2 = 21;
-const int echo_pin_3 = 51;                  //3rd
+const int echo_pin_3 = 51;                        //3rd
 const int trig_pin_3 = 52;
-const int echo_pin_4 = 2;                   //4th
+const int echo_pin_4 = 2;                         //4th
 const int trig_pin_4 = 4;
-const int echo_pin_5 = 6;                   //5th
+const int echo_pin_5 = 6;                         //5th
 const int trig_pin_5 = 20;
 
 //Alarm -> X2
@@ -31,26 +31,26 @@ const byte buzzer_pin = 45;
 const byte temperature_pin = 53;
 
 //CO2 -> X1
-const byte modbus_pin = 50;                 //RS485
+const byte modbus_pin = 50;                       //RS485
 
 //pH sensor -> X1
 const byte pH_pin = A1;
 float pH_voltage, pH_compensated;
 DFRobot_PH ph;
 
-//TDS sensor -> X1                          //mentined later as EC sensor
+//TDS sensor -> X1                                //mentined later as EC sensor
 const byte TDS_pin = A0;
 
 //Dosing pumps -> X2 
-SoftwareSerial mySerial1(13, 43);           //1st dosing pump
-SoftwareSerial mySerial2(11, 9);            //2nd
-//SoftwareSerial mySerial3(12, 42);         //3rd
-//SoftwareSerial mySerial4(10, 8);          //4th
+SoftwareSerial mySerial1(13, 43);                 //1st dosing pump
+SoftwareSerial mySerial2(11, 9);                  //2nd
+//SoftwareSerial mySerial3(12, 42);               //3rd
+//SoftwareSerial mySerial4(10, 8);                //4th
 
 //fan
 int fan_speed;
 //fan control HW-095
-int fan_control_IN2_pin = 4;               //clockwise rotation pin
+int fan_control_IN2_pin = 4;                      //clockwise rotation pin
 int fan_control_ENA_pin = 2;
 
 //Raspberry Pi -> X1
@@ -87,11 +87,16 @@ uint8_t sensor1[8] = { 0x28, 0x77, 0x07, 0x97, 0x94, 0x07, 0x03, 0x0F };
 
 //EC sensor
 const float a = 0.020;
-float EC_average;
+float EC_average;                
 
 //Raspberry Pi
 String from_Pi;
 byte alarm_flag;
+
+//main pump cycle
+unsigned long previous_millis = 0;                    //timer settings
+bool pump_status = false;                             //current condition of the pump (false == LOW, true == HIGH)
+
 
 //--------------------------MODBUS-----------------------------
 
@@ -128,7 +133,8 @@ void setup() {
   digitalWrite(fan_control_IN2_pin, LOW);
 
   //main pump
- // pinMode(main_pump_pin,OUTPUT);
+  pinMode(main_pump_pin, OUTPUT);
+  digitalWrite(main_pump_pin, LOW);
 }
 
 //---------------------------LOOP------------------------------
@@ -140,19 +146,19 @@ void loop() {
 void stateMachine() {
   static unsigned long start_machine = millis();
 
-  static unsigned long start_idle = 2000;
-  static unsigned long start_water_level = 3000;
-  static unsigned long start_alarm = 4000;
-  static unsigned long start_temp = 5000;
-  static unsigned long start_pH = 6000;
-  static unsigned long start_EC = 7000;
+  static unsigned long start_idle = 1000;
+  static unsigned long start_water_level = 1500;
+  static unsigned long start_alarm = 2000;
+  static unsigned long start_temp = 2500;
+  static unsigned long start_pH = 3000;
+  static unsigned long start_EC = 3500;
   //static unsigned long start_CO2 = 4000;
-  static unsigned long start_dose_pump_1 = 8000;
-  static unsigned long start_dose_pump_2 = 9000;
-  static unsigned long start_dose_pump_3 = 10000;
-  static unsigned long start_dose_pump_4 = 11000;
-  //static unsigned long start_main_pump = 4000;
-  static unsigned long start_fan_1 = 12000;
+  static unsigned long start_dose_pump_1 = 4500;
+  static unsigned long start_dose_pump_2 = 5000;
+  static unsigned long start_dose_pump_3 = 5500;
+  static unsigned long start_dose_pump_4 = 6000;
+  static unsigned long start_main_pump = 6500;
+  static unsigned long start_fan_1 = 7000;
   //static unsigned long start_fan_2 = 13000;
 
   enum class controllinoState : uint8_t {
@@ -167,9 +173,8 @@ void stateMachine() {
     DOSE_PUMP_2,
     DOSE_PUMP_3,
     DOSE_PUMP_4,
-    //MAIN_PUMP,
-    FAN_1,
-    //FAN_2;
+    MAIN_PUMP,
+    FANS,
   };
 
   static controllinoState currentState = controllinoState::IDLE;
@@ -251,16 +256,22 @@ void stateMachine() {
       if (millis() - start_machine >= start_dose_pump_4) {
         displayState("»»———-4th dosing pump state———-««");
         dose_pump_EC_down();
-        currentState = controllinoState::FAN_1;
+        currentState = controllinoState::MAIN_PUMP;
       }
       break;
 
-      //Main pump state
+      case controllinoState::MAIN_PUMP:
+      if (millis() - start_machine >= start_main_pump) {
+        displayState("»»———-main pump state———-««");
+        main_pump();
+        currentState = controllinoState::FANS;
+      }
+      break;
 
-      case controllinoState::FAN_1:
+      case controllinoState::FANS:
       if (millis() - start_machine >= start_fan_1) {
-        displayState("»»———-fan state———-««");
-        fan();
+        displayState("»»———-fans state———-««");
+        fans();
         currentState = controllinoState::IDLE;
 
         start_machine = millis();  
@@ -286,9 +297,9 @@ void displayState(String currentState) {
 
 //-------------------------SETTINGS----------------------------
 
-//USER SELECT:
+//USER'S SELECTION ON THE CONTROL PANEL:
 //min & max amount of nutrients in the main tank (checkup)
-float pH_lowest = 5;
+float pH_lowest = 7;
 float pH_highest = 9;
 float EC_lowest = 5;
 float EC_highest = 100;
@@ -301,6 +312,9 @@ float EC_down_dosage =5;
 int fan_speed_pct = 0; 
 //fan speed if CO2 too high
 int fan_speed_pct_CO2 = 100;
+//main pump working cycle in minutes
+float main_pump_on_min = 1;
+float main_pump_off_min = 2;    
 
 //------------------SENSORS & OUTPUT DEVICES-------------------
 
@@ -407,8 +421,8 @@ if (EC_average < EC_lowest){
     Serial.println("  Pump 2 is sleeping...");
   }
 }
-void dose_pump_pH_down(void) {                           //pump 3
-if (EC_average < pH_highest){
+void dose_pump_pH_down(void) {                             //pump 3
+if (pH_compensated > pH_highest){
   //SEND COMMAND IN ASCII (STRING)
     //mySerial3.println("d," + (String)pH_down_dosage);
     Serial.println("  Pump 3 is lowering the pH...");
@@ -418,7 +432,7 @@ if (EC_average < pH_highest){
     Serial.println("  Pump 3 is sleeping...");
   }
 }
-void dose_pump_EC_down(void) {                             //pump 4
+void dose_pump_EC_down(void) {                               //pump 4
 if (EC_average > EC_highest){
   //SEND COMMAND IN ASCII (STRING)
     //mySerial4.println("d," + (String)EC_down_dosage);
@@ -432,14 +446,30 @@ if (EC_average > EC_highest){
 
 //----------------------MAIN WATER PUMP------------------------
 
-/*digitalWrite(main_pump_pin,HIGH);
+void main_pump(){
+  float main_pump_on_ms = main_pump_on_min * 60000;                                     //convert user input from minutes to milliseconds
+  float main_pump_off_ms = main_pump_off_min * 60000;
 
-*/
+  unsigned long current_millis = millis();
+
+  if (pump_status && (current_millis - previous_millis >= main_pump_on_ms)) {           // pump ON for x milliseconds
+    Serial.println("  main pump ON");
+    digitalWrite(main_pump_pin, LOW);
+    pump_status = false;
+    previous_millis = current_millis;
+  }
+    else if (!pump_status && (current_millis - previous_millis >= main_pump_off_ms)) {  // pump OFF
+      Serial.println("  main pump OFF");
+      digitalWrite(main_pump_pin, HIGH);
+      pump_status = true;
+      previous_millis = current_millis;
+  }
+}
 
 //---------------------------FANS------------------------------
 
-void fan() {
-  fan_speed = map(fan_speed_pct, 0, 100, 0, 255);               //convert % to the actual speed value
+void fans() {
+  fan_speed = map(fan_speed_pct, 0, 100, 0, 255);                      //convert % to the actual speed value
 
   if (fan_speed_pct > 0 && fan_speed_pct < 100){
     digitalWrite(fan_control_IN2_pin, HIGH); 
@@ -458,16 +488,13 @@ void fan() {
   }
 
 //CO2 CONTROL
-/*  if (CO2_level < 800){                                        //if CO2 value too low
+/*  if (CO2_level < 800){                                             //if CO2 value too low
     fan_speed = map(fan_speed_pct_CO2, 0, 100, 0, 255);     
     digitalWrite(fan_control_IN2_pin, HIGH); 
     analogWrite(fan_control_ENA_pin, fan_speed );
   }*/
 
 }
-
-
-
 
 
 
