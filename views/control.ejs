@@ -17,11 +17,17 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-6 ms-2"> <!-- Needs js here to work as intended -->
-          <input type="text" class="form-control m-2" id="pump1" placeholder="Needed solution amount in ml" value=""> 
-          <input type="text" class="form-control m-2" id="pump2" placeholder="Needed solution amount in ml" value=""> 
-          <input type="text" class="form-control m-2" id="pump3" placeholder="Needed solution amount in ml" value=""> 
-          <input type="text" class="form-control m-2" id="pump4" placeholder="Needed solution amount in ml" value="">
+        <div class="col-6 m-3"> <!-- Needs js here to work as intended -->
+          <label for="pumpUptime" class="form-label">Main pump cycle</label>
+          <input type="text" class="form-control my-2" id="pumpUptime" placeholder="Time that pumps have to be on in minutes" value=""> 
+          <input type="text" class="form-control my-2" id="pumpDowntime" placeholder="Time the pumps have to be off in minutes" value="">
+          <input type="checkbox" class="btn-check" id="maintenance" autocomplete="off">
+          <label class="btn btn-outline-primary mt-2" for="maintenance">Maintenance mode</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-6 m-3">
+          
         </div>
       </div>
       <button class="m-3 btn btn-lg btn-primary" type="submit">Save</button>
