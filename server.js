@@ -145,8 +145,9 @@ app.post('/control', async (req,res) => {
             }
             else {
                 console.log('Succccess')
-                window.alert('Data sent!')
+                console.log(valuesCon)
             }
+            res.redirect('/control')
         })
     }
     catch{
