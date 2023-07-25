@@ -139,19 +139,24 @@ app.get('/control', (req,res) => {
 app.post('/control', async (req,res) => {
     try{
         let fanspeed = req.body.fanspeed
-        let stringy = '1,2,3,4,5,6,7,8,9'
+        let stringy = '1,2,32,4,5,6,7,8,9'
         let arr = stringy.split(',')
         console.log(arr)
-        port.write(arr, (err) => {
-            if (err) {
-                console.log('Didnt work')
-            }
-            else {
-                console.log('Succccess')
-                console.log(valuesCon)
-            }
-            res.redirect('/control')
-        })
+        setTimeout(() => {
+            for(let i=0; i <= arr.length; i++){
+                port.write(arr[i], (err) => {
+                    if (err) {
+                        console.log('Didnt work')
+                    }
+                    else {
+                        console.log('Succccess')
+                        console.log(arr[i])
+                    }
+                    
+                })
+    }}, 2000)
+        
+        res.redirect('/control')
     }
     catch{
         res.redirect('/control')
