@@ -139,7 +139,10 @@ app.get('/control', (req,res) => {
 app.post('/control', async (req,res) => {
     try{
         let fanspeed = req.body.fanspeed
-        port.write(fanspeed, (err) => {
+        let stringy = '1,2,3,4,5,6,7,8,9'
+        let arr = stringy.split(',')
+        console.log(arr)
+        port.write(arr, (err) => {
             if (err) {
                 console.log('Didnt work')
             }
