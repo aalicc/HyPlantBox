@@ -1,4 +1,4 @@
-// Welcome to LeafyAquaHub!
+// Welcome to plantsys!
 
 //-------------------------LIBRARIES----------------------------
 
@@ -13,16 +13,8 @@
 //--------------------------PINOUT------------------------------
 
 //Water level -> X1
-const int echo_pin_1 = 3;                         //1st water level sensor
-const int trig_pin_1 = 5;
-const int echo_pin_2 = 7;                         //2nd
-const int trig_pin_2 = 21;
-const int echo_pin_3 = 51;                        //3rd
-const int trig_pin_3 = 52;
-const int echo_pin_4 = 2;                         //4th
-const int trig_pin_4 = 4;
-const int echo_pin_5 = 6;                         //5th
-const int trig_pin_5 = 20;
+const int echo_pin[] = {3, 7, 51, 2, 6};
+const int trig_pin[] = {5, 21, 52, 4, 20};
 
 //Alarm -> X2
 const byte buzzer_pin = 45;
@@ -72,10 +64,10 @@ const byte main_pump_pin = 30;
 //--------------------------CONFIG-----------------------------
 
 //Water level 
-float duration;
-float distance;
-float distance_average;
-int water_level_1;
+float duration[5];
+float distance_1, distance_2, distance_3, distance_4, distance_5;
+int water_level_1, water_level_2, water_level_3, water_level_4, water_level_5;
+
 
 //Water t°
 float temperature_C;
@@ -93,14 +85,16 @@ float EC_average;
 String from_Pi;
 byte alarm_flag;
 
+//dosing pumps
+//amount of nutrients to add (in milliliters)
+float pH_up_dosage = 5;                                     
+float pH_down_dosage = 5;
+float EC_up_dosage = 5;
+float EC_down_dosage =5;
+
 //main pump cycle
 unsigned long previous_millis = 0;                    //timer settings
 bool pump_status = false;                             //current condition of the pump (false == LOW, true == HIGH)
-
-
-//--------------------------MODBUS-----------------------------
-
-//vaisala stuff
 
 //--------------------------SETUP------------------------------
 
@@ -111,8 +105,10 @@ void setup() {
   sensors.begin();
 
   //water level
-  pinMode(trig_pin_1, OUTPUT);
-  pinMode(echo_pin_1, INPUT);
+    for (int i = 0; i < 5 ; i++) {                      //declare all pins using for()
+    pinMode(trig_pin[i], OUTPUT);
+    pinMode(echo_pin[i], INPUT);
+  }
 
   //pH level
   ph.begin();
@@ -144,14 +140,14 @@ void loop() {
 }
 
 void stateMachine() {
-  static unsigned long start_machine = millis();
+  static unsigned long start_state_machine = millis();
 
   static unsigned long start_idle = 1000;
-  static unsigned long start_water_level = 1500;
-  static unsigned long start_alarm = 2000;
-  static unsigned long start_temp = 2500;
-  static unsigned long start_pH = 3000;
-  static unsigned long start_EC = 3500;
+  static unsigned long start_water_level = 2000;
+  static unsigned long start_alarm = 2500;
+  static unsigned long start_temp = 3000;
+  static unsigned long start_pH = 3500;
+  static unsigned long start_EC = 4000;
   //static unsigned long start_CO2 = 4000;
   static unsigned long start_dose_pump_1 = 4500;
   static unsigned long start_dose_pump_2 = 5000;
@@ -168,13 +164,14 @@ void stateMachine() {
     WATER_TEMP,
     pH,
     EC,
-    //CO2,
     DOSE_PUMP_1,
     DOSE_PUMP_2,
     DOSE_PUMP_3,
     DOSE_PUMP_4,
     MAIN_PUMP,
     FANS,
+    //humidifier
+    //RASPBERRY PI
   };
 
   static controllinoState currentState = controllinoState::IDLE;
@@ -182,14 +179,14 @@ void stateMachine() {
   switch (currentState) {
 
     case controllinoState::IDLE:
-      if (millis() - start_machine >= start_idle) {
+      if (millis() - start_state_machine >= start_idle) {
         displayState("»»———-IDLE state———-««");
         currentState = controllinoState::WATER_LEVEL;
       }
       break;
 
     case controllinoState::WATER_LEVEL:
-      if (millis() - start_machine >= start_water_level) {
+      if (millis() - start_state_machine >= start_water_level) {
         displayState("»»———-water level state———-««");
         water_level();
         currentState = controllinoState::ALARM;
@@ -197,7 +194,7 @@ void stateMachine() {
       break;
 
     case controllinoState::ALARM:
-      if (millis() - start_machine >= start_alarm) {
+      if (millis() - start_state_machine >= start_alarm) {
         displayState("»»———-emergency state———-««");
         alarm();
         currentState = controllinoState::WATER_TEMP;
@@ -205,7 +202,7 @@ void stateMachine() {
       break;
 
     case controllinoState::WATER_TEMP:
-      if (millis() - start_machine >= start_temp) {
+      if (millis() - start_state_machine >= start_temp) {
         displayState("»»———-water t° state———-««");
         water_temp();
         currentState = controllinoState::pH;
@@ -213,7 +210,7 @@ void stateMachine() {
       break;
 
     case controllinoState::pH:
-      if (millis() - start_machine >= start_pH) {
+      if (millis() - start_state_machine >= start_pH) {
         displayState("»»———-pH level state———-««");
         pH_level();
         currentState = controllinoState::EC;
@@ -221,7 +218,7 @@ void stateMachine() {
       break;
 
     case controllinoState::EC:
-      if (millis() - start_machine >= start_EC) {
+      if (millis() - start_state_machine >= start_EC) {
         displayState("»»———-EC state———-««");
         EC_level();
         currentState = controllinoState::DOSE_PUMP_1;
@@ -229,7 +226,7 @@ void stateMachine() {
       break;
 
     case controllinoState::DOSE_PUMP_1:
-      if (millis() - start_machine >= start_dose_pump_1) {
+      if (millis() - start_state_machine >= start_dose_pump_1) {
         displayState("»»———-1st dosing pump state———-««");
         dose_pump_pH_up();
         currentState = controllinoState::DOSE_PUMP_2;
@@ -237,7 +234,7 @@ void stateMachine() {
       break;
 
       case controllinoState::DOSE_PUMP_2:
-      if (millis() - start_machine >= start_dose_pump_2) {
+      if (millis() - start_state_machine >= start_dose_pump_2) {
         displayState("»»———-2nd dosing pump state———-««");
         dose_pump_EC_up();
         currentState = controllinoState::DOSE_PUMP_3;
@@ -245,7 +242,7 @@ void stateMachine() {
       break;
 
     case controllinoState::DOSE_PUMP_3:
-      if (millis() - start_machine >= start_dose_pump_3) {
+      if (millis() - start_state_machine >= start_dose_pump_3) {
         displayState("»»———-3rd dosing pump state———-««");
         dose_pump_pH_down();
         currentState = controllinoState::DOSE_PUMP_4;
@@ -253,7 +250,7 @@ void stateMachine() {
       break;
 
       case controllinoState::DOSE_PUMP_4:
-      if (millis() - start_machine >= start_dose_pump_4) {
+      if (millis() - start_state_machine >= start_dose_pump_4) {
         displayState("»»———-4th dosing pump state———-««");
         dose_pump_EC_down();
         currentState = controllinoState::MAIN_PUMP;
@@ -261,7 +258,7 @@ void stateMachine() {
       break;
 
       case controllinoState::MAIN_PUMP:
-      if (millis() - start_machine >= start_main_pump) {
+      if (millis() - start_state_machine >= start_main_pump) {
         displayState("»»———-main pump state———-««");
         main_pump();
         currentState = controllinoState::FANS;
@@ -269,15 +266,16 @@ void stateMachine() {
       break;
 
       case controllinoState::FANS:
-      if (millis() - start_machine >= start_fan_1) {
+      if (millis() - start_state_machine >= start_fan_1) {
         displayState("»»———-fans state———-««");
         fans();
         currentState = controllinoState::IDLE;
 
-        start_machine = millis();  
+        start_state_machine = millis();  
       }
       break;
 
+      //humidifier
       //Raspberry Pi
 
     default:
@@ -303,49 +301,106 @@ float pH_lowest = 7;
 float pH_highest = 9;
 float EC_lowest = 5;
 float EC_highest = 100;
-//amount of nutrients to add (in milliliters)
-float pH_up_dosage = 5;                                     
-float pH_down_dosage = 5;
-float EC_up_dosage = 5;
-float EC_down_dosage =5;
+
 //fan default speed  0% - 100%
 int fan_speed_pct = 0; 
-//fan speed if CO2 too high
-int fan_speed_pct_CO2 = 100;
+int humidity_highest = 60;
 //main pump working cycle in minutes
 float main_pump_on_min = 1;
-float main_pump_off_min = 2;    
+float main_pump_off_min = 2;   
+/* 
+//incoming data from Raspberry Pi is in the String format
+String fan_speed_pct_pi, pH_lowest_pi, pH_highest_pi, EC_lowest_pi, EC_highest_pi, humidity_highest_pi, main_pump_on_min_pi, main_pump_off_min_pi;
+*/
+/*void raspberry_pi(){
+  if (Serial1.available()){
+    for (int i=0; i <= 9; i++){
+      get_values[i]= Serial1.readString();
+      //receive_values += get_values;
+      //d = receive_values.toFloat();
+      Serial.println(get_values[i]); 
+      delay(500);
+      }
+    }
+  //convert to the right format
+  String fan_speed_pct_pi = get_values[0];
+  fan_speed_pct = fan_speed_pct_pi.toInt();
+
+  String pH_lowest_pi = get_values[1];
+  pH_lowest = pH_lowest_pi.toFloat();
+
+  String pH_highest_pi = get_values[2];
+  pH_highest = pH_highest_pi.toInt();
+
+  String EC_lowest_pi = get_values[3];
+  EC_lowest = EC_lowest_pi.toFloat();
+  
+  String EC_lowest_pi = get_values[3];
+  EC_lowest = EC_lowest_pi.toFloat();  
+  
+  String EC_highest_pi = get_values[4];
+  EC_highest = EC_highest_pi.toFloat(); 
+  
+  String humidity_highest_pi = get_values[5];
+  humidity_highest = humidity_highest_pi.toFloat(); 
+  
+  String main_pump_on_min_pi = get_values[6];
+  main_pump_on_min = main_pump_on_min_pi.toFloat(); 
+  
+  String main_pump_off_min_pi = get_values[7];
+  main_pump_off_min = main_pump_off_min_pi.toFloat();
+
+  Serial1.flush();
+  }
+*/
+
 
 //------------------SENSORS & OUTPUT DEVICES-------------------
 
-//----------------------DFRobot SEN0208------------------------
+//--------------------------HC-SR04----------------------------
 
 void water_level(void) {
-  float water_level_sum = 0;
-  for (int i = 0; i < 3; i++) {
-    digitalWrite(trig_pin_1, LOW);                          // Clears the trigPin condition first
+  float water_level_sum_1 = 0, water_level_sum_2 = 0;
+  for (int i = 0; i < 5 ; i++) {                        //"i" = number of ultrasonic sensor used
+    digitalWrite(trig_pin[i], LOW);
     delayMicroseconds(2);
-    digitalWrite(trig_pin_1, HIGH);                         // Sets the water_level_trig_pin HIGH (ACTIVE) for 10 microseconds (time for 8 cycle sonic bursts)
+    digitalWrite(trig_pin[i], HIGH);
     delayMicroseconds(10);
-    digitalWrite(trig_pin_1, LOW);
-    duration = pulseIn(echo_pin_1, HIGH);                   // Reads the water_level_echo_pin, returns the sound wave travel time in microseconds
-    distance = duration * 0.034 / 2;                        // Speed of sound wave divided by 2 (go and back)
-    water_level_sum = water_level_sum + distance;
+    digitalWrite(trig_pin[i], LOW);   
+    duration[i] = pulseIn(echo_pin[i], HIGH);
     delay(20);
-  }
-  distance_average = round(water_level_sum / 3.0);
-  water_level_1 = map(distance_average, 0, 61, 0, 100);      //(average distance, min cm, max cm, min %, max %)
-  Serial.println("  Distance in cm: " + (String)distance_average);
-  //Serial.println("  Distance in %: " + (String)water_level_1);
 }
+distance_1 = round(duration[0] * 0.034 / 2);            //common formula for distance calculation
+distance_2 = round(duration[1] * 0.034 / 2); 
+//distance_3 = round(duration[2] * 0.034 / 2);            
+//distance_4 = round(duration[3] * 0.034 / 2); 
+//distance_5 = round(duration[4] * 0.034 / 2); 
+
+//PRINT DISTANCE IN CM
+Serial.println("  Distance 1 in cm: " + (String)distance_1);
+Serial.println("  Distance 2 in cm: " + (String)distance_2);  
+//PRINT DISTANCE IN %
+//map(real distance, min distance, max distance, min distance in %, max distance in %)
+water_level_1 = map(distance_1, 0, 62, 0, 100);               
+water_level_2 = map(distance_2, 0, 62, 0, 100);      
+//water_level_3 = map(distance_1, 0, 62, 0, 100);               
+//water_level_4 = map(distance_2, 0, 62, 0, 100);       
+//water_level_5 = map(distance_2, 0, 62, 0, 100);    
+Serial.println("  Distance in %: " + (String)water_level_1);
+Serial.println("  Distance in %: " + (String)water_level_2);
+//Serial.println("  Distance in %: " + (String)water_level_3);
+//Serial.println("  Distance in %: " + (String)water_level_4);
+//Serial.println("  Distance in %: " + (String)water_level_5);
+}
+
 
 //-----------------------Buzzer---------------------------
 
 void alarm(void) {
-  if ((water_level_1 > 120) || (water_level_1 < 20)) {
+  if ((water_level_1 <= 15) || (water_level_2 <= 15)){ //|| (water_level_3 <= 15) || (water_level_4 <= 15) || (water_level_5 <= 15)){
     Serial.println("  Check the water tanks ASAP!");
     tone(buzzer_pin, 40);
-    } else if ((water_level_1 <= 5)) {
+    } else if ((water_level_1 <= 5) || (water_level_2 <= 5)){ //|| (water_level_3 <= 5) || (water_level_4 <= 5) || (water_level_5 <= 5)) {
       Serial.println("emergency");
       tone(buzzer_pin, 40);
       delay(200);
@@ -392,10 +447,6 @@ void EC_level(void) {
   EC_average = EC_sum / 5;                                 
   Serial.println("  EC (mS/m): " + (String)EC_average);
 }
-
-//-----------------------Vaisala GMP252------------------------
-
-
 
 //------------------Atlas Scientific SGL-PMP-BX----------------
 
@@ -469,8 +520,22 @@ void main_pump(){
 //---------------------------FANS------------------------------
 
 void fans() {
-  fan_speed = map(fan_speed_pct, 0, 100, 0, 255);                      //convert % to the actual speed value
+/*  fan_speed = map(fan_speed_pct, 0, 100, 0, 255);                      //convert % to the actual speed value
 
+if (humidity >= humidity_highest && fan_speed_pct > 0) {
+    digitalWrite(fan_control_IN2_pin, HIGH); 
+    analogWrite(fan_control_ENA_pin, fan_speed );
+    Serial.println("  Fan speed set on " + (String)fan_speed_pct);
+  }
+  else{
+    digitalWrite(fan_control_IN2_pin, LOW); 
+    Serial.println("  Fan OFF");
+  }
+}
+*/
+
+
+/*
   if (fan_speed_pct > 0 && fan_speed_pct < 100){
     digitalWrite(fan_control_IN2_pin, HIGH); 
     analogWrite(fan_control_ENA_pin, fan_speed );
@@ -486,15 +551,17 @@ void fans() {
     analogWrite(fan_control_ENA_pin, fan_speed );
     Serial.println("Fan's limit is 100%");
   }
-
-//CO2 CONTROL
-/*  if (CO2_level < 800){                                             //if CO2 value too low
-    fan_speed = map(fan_speed_pct_CO2, 0, 100, 0, 255);     
-    digitalWrite(fan_control_IN2_pin, HIGH); 
-    analogWrite(fan_control_ENA_pin, fan_speed );
-  }*/
+*/
 
 }
+
+//------------------------HUMIDIFIER---------------------------
+
+//solid state relay
+
+
+
+
 
 
 
