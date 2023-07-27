@@ -138,12 +138,14 @@ app.get('/control', (req,res) => {
 
 app.post('/control', async (req,res) => {
     try{
-        let fanspeed = req.body.fanspeed
-        let stringy = '1,2,32,4,5,6,7,8,9'
-        let arr = stringy.split(',')
+        let ruuvi1Q = await knex.ruuvidata('ruuvi1').max('time').select('Temp', 'Hum')
+        let fanspeed = req.body.fanspeed //implement variable which when set blocks sending of separate humidity data
+        let stringy = 's, 1.23, 2.34, 3, 4, 5, 6, 7, 8, o' //settings have to be here instead of ruuvi data
+        let arr = stringy.split(',') //to send humidity data constantly a loop is needed which will be paused for the duration of this here post route function
+        let i = 0
         console.log(arr)
-        setTimeout(() => {
-            for(let i=0; i <= arr.length; i++){
+        setInterval(() => {
+            if (i <= 8){ //replace with amount of parameteres -1 so that the app does not crash
                 port.write(arr[i], (err) => {
                     if (err) {
                         console.log('Didnt work')
@@ -151,11 +153,13 @@ app.post('/control', async (req,res) => {
                     else {
                         console.log('Succccess')
                         console.log(arr[i])
+                        i++
                     }
-                    
                 })
-    }}, 2000)
-        
+            }
+
+        }, 110)
+        i = 0
         res.redirect('/control')
     }
     catch{
