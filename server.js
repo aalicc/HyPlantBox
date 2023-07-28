@@ -17,18 +17,44 @@ const {SerialPort} = require('serialport')
 const {ReadlineParser} = require('@serialport/parser-readline')
 const knex = require('./db/knex.js')
 
+
+//variables
+let users = []
+let valuesCon
+let dataFlag = 0
+
 const initializePassport = require('./passport-config')
 const path = require("path");
 const { Readline } = require('readline/promises')
+const { data } = require('jquery')
 initializePassport(
     passport,
     email => users.find(user => user.email === email),
     id => users.find(user => user.id === id)
 )
+const sendHumidity = async () => {
+        let ruuvi1Q = await knex.ruuvidata('ruuvi1').max('time').select('Temp', 'Hum')
+        let stringy = 'r, ' + ruuvi1Q[0].Hum //settings have to be here instead of ruuvi data
+        let arr = stringy.split(',')
+        let i = 0
+        console.log(arr)
+        setInterval(() => {
+            if (i <= 1){ //replace with amount of parameteres -1 so that the app does not crash
+                port.write(arr[i], (err) => {
+                    if (err) {
+                        console.log('Didnt work')
+                    }
+                    else {
+                        console.log('Succccess')
+                        console.log(arr[i])
+                        i++
+                    }
+                })
+            }
+        }, 110)
+        i = 0
+}
 
-//variables
-let users = []
-let valuesCon
 
 //serial connection
 const port = new SerialPort({
@@ -58,7 +84,8 @@ port.open((err) => {
         }
       })
     }
-  })
+})
+
   
 //package settings
 app.use(bodyParser.urlencoded({extended: false}))
@@ -75,6 +102,10 @@ app.use(passport.session())
 app.use(methodOverride('_method'))
 app.use(express.static(__dirname + '/views'))
 app.set('view engine', 'ejs')
+
+if(dataFlag < 1){
+    setInterval(sendHumidity, 5000)
+}
 
 //rest
 app.get('/', checkNotAuthenticated,(req, res) =>{
@@ -137,7 +168,9 @@ app.get('/control', (req,res) => {
 })
 
 app.post('/control', async (req,res) => {
+    dataFlag = 1
     try{
+        dataFlag = 1
         let ruuvi1Q = await knex.ruuvidata('ruuvi1').max('time').select('Temp', 'Hum')
         let fanspeed = req.body.fanspeed //implement variable which when set blocks sending of separate humidity data
         let stringy = 's, 1.23, 2.34, 3, 4, 5, 6, 7, 8, o' //settings have to be here instead of ruuvi data
@@ -165,12 +198,14 @@ app.post('/control', async (req,res) => {
     catch{
         res.redirect('/control')
     }
+    dataFlag = 0
 })
 
 /*app.delete('/logout', (req, res) => {
     req.logOut()
     res.redirect('/login')
 })*/
+
 
 function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
