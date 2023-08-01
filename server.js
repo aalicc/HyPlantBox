@@ -22,15 +22,16 @@ const knex = require('./db/knex.js')
 let users = []
 let valuesCon
 let dataFlag = false
+let interval1
 
-setInterval(() => {
+interval1 = setInterval(() => {
     if (dataFlag) {
         return
     }
     if (!dataFlag){
         sendHumidity()
     }
-}, 5000)
+}, 3000)
 
 const initializePassport = require('./passport-config')
 const path = require("path");
@@ -44,18 +45,18 @@ initializePassport(
 const sendHumidity = async () => {
         let ruuvi1Q = await knex.ruuvidata('ruuvi1').max('time').select('Temp', 'Hum')
         let stringy = 'r, ' + ruuvi1Q[0].Hum //settings have to be here instead of ruuvi data
-        let arr = stringy.split(',')
+        let arr1 = stringy.split(',')
         let i = 0
-        console.log(arr)
+        console.log(arr1)
         setInterval(() => {
             if (i <= 1){ //replace with amount of parameteres -1 so that the app does not crash
-                port.write(arr[i], (err) => {
+                port.write(arr1[i], (err) => {
                     if (err) {
                         console.log('Didnt work')
                     }
                     else {
                         console.log('Succccess')
-                        console.log(arr[i])
+                        console.log(arr1[i])
                         i++
                     }
                 })
@@ -181,6 +182,7 @@ app.post('/control', async (req,res) => {
         let arr = stringy.split(',') //to send humidity data constantly a loop is needed which will be paused for the duration of this here post route function
         let i = 0
         console.log(arr)
+        clearInterval(interval1)
         setInterval(() => {
             if (i <= 8){ //replace with amount of parameteres -1 so that the app does not crash
                 port.write(arr[i], (err) => {
@@ -199,6 +201,15 @@ app.post('/control', async (req,res) => {
         i = 0
         res.redirect('/control')
         dataFlag = false
+
+        interval1 = setInterval(() => {
+            if (dataFlag) {
+                return
+            }
+            if (!dataFlag){
+                sendHumidity()
+            }
+        }, 3000)
     }
     catch{
         res.redirect('/control')
