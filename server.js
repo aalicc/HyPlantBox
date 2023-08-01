@@ -21,7 +21,16 @@ const knex = require('./db/knex.js')
 //variables
 let users = []
 let valuesCon
-let dataFlag = 0
+let dataFlag = false
+
+setInterval(() => {
+    if (dataFlag) {
+        return
+    }
+    if (!dataFlag){
+        sendHumidity()
+    }
+}, 5000)
 
 const initializePassport = require('./passport-config')
 const path = require("path");
@@ -103,10 +112,6 @@ app.use(methodOverride('_method'))
 app.use(express.static(__dirname + '/views'))
 app.set('view engine', 'ejs')
 
-if(dataFlag < 1){
-    setInterval(sendHumidity, 5000)
-}
-
 //rest
 app.get('/', checkNotAuthenticated,(req, res) =>{
     res.redirect('/login')
@@ -168,9 +173,8 @@ app.get('/control', (req,res) => {
 })
 
 app.post('/control', async (req,res) => {
-    dataFlag = 1
     try{
-        dataFlag = 1
+        dataFlag = true
         let ruuvi1Q = await knex.ruuvidata('ruuvi1').max('time').select('Temp', 'Hum')
         let fanspeed = req.body.fanspeed //implement variable which when set blocks sending of separate humidity data
         let stringy = 's, 1.23, 2.34, 3, 4, 5, 6, 7, 8, o' //settings have to be here instead of ruuvi data
@@ -194,11 +198,11 @@ app.post('/control', async (req,res) => {
         }, 110)
         i = 0
         res.redirect('/control')
+        dataFlag = false
     }
     catch{
         res.redirect('/control')
-    }
-    dataFlag = 0
+    } 
 })
 
 /*app.delete('/logout', (req, res) => {
