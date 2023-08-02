@@ -1,6 +1,6 @@
 /* 
 INSTRUCTIONS FOR CALIBRATION AND OTHER: https://wiki.dfrobot.com/Gravity__Analog_pH_Sensor_Meter_Kit_V2_SKU_SEN0161-V2
-if you're using CONTROLLINO MAXI like me and the reading are wrong, please downlad and try my modified DFRobot library
+if you're using CONTROLLINO MAXI like me and the readings are wrong, please downlad and try my modified DFRobot library
 link to the library: https://github.com/aalicc/DFRobot_pH_v2
 */
 
