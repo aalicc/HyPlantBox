@@ -24,15 +24,6 @@ let valuesCon
 let dataFlag = false
 let interval1
 
-interval1 = setInterval(() => {
-    if (dataFlag) {
-        return
-    }
-    if (!dataFlag){
-        sendHumidity()
-    }
-}, 3000)
-
 const initializePassport = require('./passport-config')
 const path = require("path");
 const { Readline } = require('readline/promises')
@@ -42,28 +33,16 @@ initializePassport(
     email => users.find(user => user.email === email),
     id => users.find(user => user.id === id)
 )
-const sendHumidity = async () => {
-        let ruuvi1Q = await knex.ruuvidata('ruuvi1').max('time').select('Temp', 'Hum')
-        let stringy = 'r, ' + ruuvi1Q[0].Hum //settings have to be here instead of ruuvi data
-        let arr1 = stringy.split(',')
-        let i = 0
-        console.log(arr1)
-        setInterval(() => {
-            if (i <= 1){ //replace with amount of parameteres -1 so that the app does not crash
-                port.write(arr1[i], (err) => {
-                    if (err) {
-                        console.log('Didnt work')
-                    }
-                    else {
-                        console.log('Succccess')
-                        console.log(arr1[i])
-                        i++
-                    }
-                })
-            }
-        }, 110)
-        i = 0
-}
+
+
+interval1 = setInterval(() => {
+    if (dataFlag) {
+        return
+    }
+    if (!dataFlag){
+        sendHumidity()
+    }
+}, 5000)
 
 
 //serial connection
@@ -177,8 +156,7 @@ app.post('/control', async (req,res) => {
     try{
         dataFlag = true
         let ruuvi1Q = await knex.ruuvidata('ruuvi1').max('time').select('Temp', 'Hum')
-        let fanspeed = req.body.fanspeed //implement variable which when set blocks sending of separate humidity data
-        let stringy = 's, 1.23, 2.34, 3, 4, 5, 6, 7, 8, o' //settings have to be here instead of ruuvi data
+        let stringy = 's, 1.23, 2.34, 3, 4, 5, 6, 7, 8' //settings have to be here instead of ruuvi data
         let arr = stringy.split(',') //to send humidity data constantly a loop is needed which will be paused for the duration of this here post route function
         let i = 0
         console.log(arr)
@@ -197,7 +175,7 @@ app.post('/control', async (req,res) => {
                 })
             }
 
-        }, 110)
+        }, 55)
         i = 0
         res.redirect('/control')
         dataFlag = false
@@ -209,7 +187,7 @@ app.post('/control', async (req,res) => {
             if (!dataFlag){
                 sendHumidity()
             }
-        }, 3000)
+        }, 5000)
     }
     catch{
         res.redirect('/control')
@@ -221,6 +199,29 @@ app.post('/control', async (req,res) => {
     res.redirect('/login')
 })*/
 
+const sendHumidity = async () => {
+    let ruuvi1Q = await knex.ruuvidata('ruuvi1').max('time').select('Temp', 'Hum')
+    let ruuviProQ = await knex.ruuvidata('ruuviPro').max('time').select('Temp', 'Hum')
+    let stringy = 'r, ' + ruuvi1Q[0].Temp + ', ' + ruuvi1Q[0].Hum + ', ' + ruuviProQ[0].Temp + ', ' + ruuviProQ[0].Hum
+    let arr1 = stringy.split(',')
+    let i = 0
+    console.log(arr1)
+    setInterval(() => {
+        if (i <= 4){ //replace with amount of parameteres -1 so that the app does not crash
+            port.write(arr1[i], (err) => {
+                if (err) {
+                    console.log('Didnt work')
+                }
+                else {
+                    console.log('Succccess')
+                    console.log(arr1[i])
+                    i++
+                }
+            })
+        }
+    }, 55)
+    i = 0
+}
 
 function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
