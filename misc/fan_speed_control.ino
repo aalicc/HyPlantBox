@@ -1,11 +1,10 @@
 //This code can be used to check HW-095 motor driver or similar. 
 //Type the speed right in the Serial monitor (0 - 100%).
 
-int IN2 = 6;
-int ENA = 5;                                            //PWM signal
+int IN2 = 5;
+int ENA = 6;                                            //PWM signal
 int speed;
 int speed_pct;
-boolean received = false;
 
 void setup() {
 
@@ -36,8 +35,4 @@ void EnterSpeed(){
       Serial.println(speed);                             //prints actual speed
       delay(3000);
       }
-        else {
-          digitalWrite(IN2, LOW); 
-          Serial.println("  Fan OFF");
-        }
 }
