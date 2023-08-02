@@ -156,7 +156,7 @@ app.post('/control', async (req,res) => {
     try{
         dataFlag = true
         let ruuvi1Q = await knex.ruuvidata('ruuvi1').max('time').select('Temp', 'Hum')
-        let stringy = 's, 1.23, 2.34, 3, 4, 5, 6, 7, 8' //settings have to be here instead of ruuvi data
+        let stringy = 's, 70, 100, 3, 4, 5, 6, 7, 8' //settings have to be here instead of ruuvi data
         let arr = stringy.split(',') //to send humidity data constantly a loop is needed which will be paused for the duration of this here post route function
         let i = 0
         console.log(arr)
@@ -175,7 +175,7 @@ app.post('/control', async (req,res) => {
                 })
             }
 
-        }, 55)
+        }, 58)
         i = 0
         res.redirect('/control')
         dataFlag = false
@@ -219,7 +219,7 @@ const sendHumidity = async () => {
                 }
             })
         }
-    }, 55)
+    }, 58)
     i = 0
 }
 

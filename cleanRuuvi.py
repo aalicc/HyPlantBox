@@ -37,7 +37,7 @@ while True:
         emptyTable2(conn)
     
     try:
-        time.sleep(180)
+        time.sleep(300)
 
     except KeyboardInterrupt:
         print('Exit')

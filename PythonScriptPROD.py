@@ -65,7 +65,7 @@ while True:
 
     # Wait for x seconds and start over again
     try:
-        time.sleep(0.5)
+        time.sleep(0.9)
 
     except KeyboardInterrupt:
         break
