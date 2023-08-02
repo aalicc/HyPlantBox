@@ -1,4 +1,4 @@
-// Welcome to plantsys!
+// Welcome to ... project!
 
 //-------------------------LIBRARIES----------------------------
 
@@ -22,41 +22,36 @@ const byte buzzer_pin = 45;
 //Water t° -> X1
 const byte temperature_pin = 53;
 
-//CO2 -> X1
-const byte modbus_pin = 50;                       //RS485
-
 //pH sensor -> X1
 const byte pH_pin = A1;
 float pH_voltage, pH_compensated;
 DFRobot_PH ph;
 
-//TDS sensor -> X1                                //mentined later as EC sensor
+//TDS sensor -> X1                                  //mentined later as EC sensor
 const byte TDS_pin = A0;
 
 //Dosing pumps -> X2 
-SoftwareSerial mySerial1(13, 43);                 //1st dosing pump
-SoftwareSerial mySerial2(11, 9);                  //2nd
-//SoftwareSerial mySerial3(12, 42);               //3rd
-//SoftwareSerial mySerial4(10, 8);                //4th
+  SoftwareSerial mySerial1(13, 43);                 //(rx, tx)
+  SoftwareSerial mySerial2(11, 9);                  
+  //SoftwareSerial mySerial3(12, 42);               
+  //SoftwareSerial mySerial4(10, 8);                
 
 //fan
 int fan_speed;
 //fan control HW-095
-int fan_control_IN2_pin = 4;                      //clockwise rotation pin
-int fan_control_ENA_pin = 2;
+int fan_control_IN2_pin = 17;                       //clockwise rotation pin
+int fan_control_ENA_pin = 45;
+//int fan_control_IN2_pin = 16;                      //clockwise rotation pin
+//int fan_control_ENA_pin = 44;
 
-//Raspberry Pi -> X1
-const byte raspberry_pi_pin = 1;
+//raspberry Pi -> X1
+#define mySerial raspberry_Pi;
 
 //--------------------------RELAYS-----------------------------
 
 //Dosing pumps -> Relay 1
 const byte dose_pump_12V_pin_1 = 23;
 const byte dose_pump_12V_pin_2 = 24;
-
-//Fan -> Relay 0
-const byte fan_pin_1 = 22;
-//const byte fan_pin_2 = 
 
 //Main pump -> Relay 8
 const byte main_pump_pin = 30;
@@ -68,22 +63,19 @@ float duration[5];
 float distance_1, distance_2, distance_3, distance_4, distance_5;
 int water_level_1, water_level_2, water_level_3, water_level_4, water_level_5;
 
-
 //Water t°
 float temperature_C;
 //OneWire settings
 OneWire oneWire(temperature_pin);
 DallasTemperature sensors(&oneWire);
-uint8_t sensor1[8] = { 0x28, 0x77, 0x07, 0x97, 0x94, 0x07, 0x03, 0x0F };
+uint8_t sensor1[8] = {0x28, 0x12, 0xF2, 0x20, 0x0F, 0x00, 0x00, 0x21};
+
+//uint8_t sensor1[8] = { 0x28, 0x77, 0x07, 0x97, 0x94, 0x07, 0x03, 0x0F };
 //uint8_t sensor2[8] = { 0x28, 0x83, 0x53, 0x97, 0x94, 0x13, 0x03, 0xFC };
 
 //EC sensor
 const float a = 0.020;
 float EC_average;                
-
-//Raspberry Pi
-String from_Pi;
-byte alarm_flag;
 
 //dosing pumps
 //amount of nutrients to add (in milliliters)
@@ -96,6 +88,12 @@ float EC_down_dosage =5;
 unsigned long previous_millis = 0;                    //timer settings
 bool pump_status = false;                             //current condition of the pump (false == LOW, true == HIGH)
 
+//raspberry Pi
+String get_settings[10];                              //settings from the control panel
+String get_ruuvi[10];                                 //data from Ruuvi tags
+float humidity_1 = 0, humidity_2 = 0;
+float temperature_1 = 0, temperature_2 = 0;
+
 //--------------------------SETUP------------------------------
 
 void setup() {
@@ -105,10 +103,9 @@ void setup() {
   sensors.begin();
 
   //water level
-    for (int i = 0; i < 5 ; i++) {                      //declare all pins using for()
+    for (int i = 0; i < 5 ; i++) {                    //declare all pins using for()
     pinMode(trig_pin[i], OUTPUT);
-    pinMode(echo_pin[i], INPUT);
-  }
+    pinMode(echo_pin[i], INPUT);}
 
   //pH level
   ph.begin();
@@ -131,6 +128,9 @@ void setup() {
   //main pump
   pinMode(main_pump_pin, OUTPUT);
   digitalWrite(main_pump_pin, LOW);
+
+  //raspberry Pi
+  Serial1.setTimeout(100);                            //time for which Controllino receives the data set
 }
 
 //---------------------------LOOP------------------------------
@@ -148,7 +148,6 @@ void stateMachine() {
   static unsigned long start_temp = 3000;
   static unsigned long start_pH = 3500;
   static unsigned long start_EC = 4000;
-  //static unsigned long start_CO2 = 4000;
   static unsigned long start_dose_pump_1 = 4500;
   static unsigned long start_dose_pump_2 = 5000;
   static unsigned long start_dose_pump_3 = 5500;
@@ -170,7 +169,6 @@ void stateMachine() {
     DOSE_PUMP_4,
     MAIN_PUMP,
     FANS,
-    //humidifier
     //RASPBERRY PI
   };
 
@@ -275,8 +273,8 @@ void stateMachine() {
       }
       break;
 
-      //humidifier
       //Raspberry Pi
+      //maintenance mode
 
     default:
       // Nothing to do here
@@ -297,63 +295,81 @@ void displayState(String currentState) {
 
 //USER'S SELECTION ON THE CONTROL PANEL:
 //min & max amount of nutrients in the main tank (checkup)
-float pH_lowest = 7;
-float pH_highest = 9;
-float EC_lowest = 5;
-float EC_highest = 100;
-
+float pH_lowest = 0;
+float pH_highest = 0;
+float EC_lowest = 0;
+float EC_highest = 0;
 //fan default speed  0% - 100%
 int fan_speed_pct = 0; 
-int humidity_highest = 60;
+int humidity_highest = 0;
+float temperature_highest = 0;
 //main pump working cycle in minutes
-float main_pump_on_min = 1;
-float main_pump_off_min = 2;   
-/* 
+float main_pump_on_min = 0;
+float main_pump_off_min = 0;  
+
 //incoming data from Raspberry Pi is in the String format
-String fan_speed_pct_pi, pH_lowest_pi, pH_highest_pi, EC_lowest_pi, EC_highest_pi, humidity_highest_pi, main_pump_on_min_pi, main_pump_off_min_pi;
-*/
-/*void raspberry_pi(){
+String fan_speed_pct_pi, pH_lowest_pi, pH_highest_pi, EC_lowest_pi, EC_highest_pi, humidity_highest_pi, main_pump_on_min_pi, main_pump_off_min_pi, humidity_1_ruuvi, humidity_2_ruuvi;
+
+void Pi_communication(){
   if (Serial1.available()){
-    for (int i=0; i <= 9; i++){
-      get_values[i]= Serial1.readString();
-      //receive_values += get_values;
-      //d = receive_values.toFloat();
-      Serial.println(get_values[i]); 
-      delay(500);
+    if ((Serial1.readString() == "s")){
+      for (int i = 1; i <= 8; i++){
+        get_settings[i]= Serial1.readStringUntil("o");
+        //Serial.println(get_settings[i]); 
       }
     }
-  //convert to the right format
-  String fan_speed_pct_pi = get_values[0];
-  fan_speed_pct = fan_speed_pct_pi.toInt();
+      else {
+        for (int k = 1; k <= 4; k++){
+        get_ruuvi[k] = Serial1.readString();
+        //Serial.println(get_ruuvi[k]);
+      }
+    }
+}
+//convert received data to the right format
+//settings from the control panel
+String fan_speed_pct_pi = get_settings[0];
+fan_speed_pct = fan_speed_pct_pi.toInt();
 
-  String pH_lowest_pi = get_values[1];
-  pH_lowest = pH_lowest_pi.toFloat();
+String pH_lowest_pi = get_settings[1];
+pH_lowest = pH_lowest_pi.toFloat();
 
-  String pH_highest_pi = get_values[2];
-  pH_highest = pH_highest_pi.toInt();
+String pH_highest_pi = get_settings[2];
+pH_highest = pH_highest_pi.toInt();
 
-  String EC_lowest_pi = get_values[3];
-  EC_lowest = EC_lowest_pi.toFloat();
-  
-  String EC_lowest_pi = get_values[3];
-  EC_lowest = EC_lowest_pi.toFloat();  
-  
-  String EC_highest_pi = get_values[4];
-  EC_highest = EC_highest_pi.toFloat(); 
-  
-  String humidity_highest_pi = get_values[5];
-  humidity_highest = humidity_highest_pi.toFloat(); 
-  
-  String main_pump_on_min_pi = get_values[6];
-  main_pump_on_min = main_pump_on_min_pi.toFloat(); 
-  
-  String main_pump_off_min_pi = get_values[7];
-  main_pump_off_min = main_pump_off_min_pi.toFloat();
+String EC_lowest_pi = get_settings[3];
+EC_lowest = EC_lowest_pi.toFloat();
 
-  Serial1.flush();
+String EC_highest_pi = get_settings[4];
+EC_highest = EC_highest_pi.toFloat(); 
+
+String humidity_highest_pi = get_settings[5];
+humidity_highest = humidity_highest_pi.toFloat(); 
+
+String temp_highest_pi = get_settings[6];
+temperature_highest = temp_highest_pi.toFloat(); 
+
+String main_pump_on_min_pi = get_settings[7];
+main_pump_on_min = main_pump_on_min_pi.toFloat(); 
+
+String main_pump_off_min_pi = get_settings[8];
+main_pump_off_min = main_pump_off_min_pi.toFloat();
+
+//data from Ruuvi
+String humidity_1_ruuvi = get_ruuvi[2];
+humidity_1 = humidity_1_ruuvi.toFloat(); 
+String humidity_2_ruuvi = get_ruuvi[4];
+humidity_2 = humidity_2_ruuvi.toFloat(); 
+}
+
+/*void maintenance_mode(){
+  while (button is pressed){
+    digitalWrite(fan_control_IN2_pin, LOW); 
+    digitalWrite(main_pump_pin, LOW);
+    digitalWrite(dose_pump_12V_pin_1, LOW);
+    digitalWrite(dose_pump_12V_pin_2, LOW);
   }
+}
 */
-
 
 //------------------SENSORS & OUTPUT DEVICES-------------------
 
@@ -393,19 +409,18 @@ Serial.println("  Distance in %: " + (String)water_level_2);
 //Serial.println("  Distance in %: " + (String)water_level_5);
 }
 
-
 //-----------------------Buzzer---------------------------
 
 void alarm(void) {
   if ((water_level_1 <= 15) || (water_level_2 <= 15)){ //|| (water_level_3 <= 15) || (water_level_4 <= 15) || (water_level_5 <= 15)){
-    Serial.println("  Check the water tanks ASAP!");
+    Serial.println("  Check the water tanks!");
     tone(buzzer_pin, 40);
     } else if ((water_level_1 <= 5) || (water_level_2 <= 5)){ //|| (water_level_3 <= 5) || (water_level_4 <= 5) || (water_level_5 <= 5)) {
-      Serial.println("emergency");
+      Serial.println("  Emergency!");
       tone(buzzer_pin, 40);
       delay(200);
       } else {
-        Serial.println("  OK");
+        Serial.println("  OK.");
         noTone(buzzer_pin);
       }
 }
@@ -422,7 +437,7 @@ void water_temp(void) {
 
 void pH_level(void) {
   pH_voltage = analogRead(pH_pin)/1024.0*5000;            // read the voltage
-  pH_compensated = ph.readPH(pH_voltage,temperature_C);   // convert voltage to pH with temperature compensation
+  pH_compensated = ph.readPH(pH_voltage, temperature_C);   // convert voltage to pH with temperature compensation
   //Serial.print("temperature:");
   //Serial.print(temperature_C,1);
   Serial.print("  pH: ");
@@ -520,7 +535,7 @@ void main_pump(){
 //---------------------------FANS------------------------------
 
 void fans() {
-/*  fan_speed = map(fan_speed_pct, 0, 100, 0, 255);                      //convert % to the actual speed value
+/*  fan_speed = map(fan_speed_pct, 0, 100, 0, 255);                                    //convert % to the actual speed value
 
 if (humidity >= humidity_highest && fan_speed_pct > 0) {
     digitalWrite(fan_control_IN2_pin, HIGH); 
@@ -554,19 +569,3 @@ if (humidity >= humidity_highest && fan_speed_pct > 0) {
 */
 
 }
-
-//------------------------HUMIDIFIER---------------------------
-
-//solid state relay
-
-
-
-
-
-
-
-/*------------------------REFERENCES---------------------------
-
-SGL-PMP-BX (pump): https://files.atlas-scientific.com/Arduino-Uno-PMP-sample-code.pdf
-
-*/
