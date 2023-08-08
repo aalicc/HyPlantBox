@@ -38,9 +38,9 @@ const byte TDS_pin = A0;
 
 //fan
 int fan_speed;
-//fan control HW-095
-int fan_control_IN2_pin = 17;                       //clockwise rotation pin
-int fan_control_ENA_pin = 45;
+//fan controller MDD3A
+int fan_control_M1A_pin = 45;
+int fan_control_M2A_pin = 44;
 //int fan_control_IN2_pin = 16;                      //clockwise rotation pin
 //int fan_control_ENA_pin = 44;
 
@@ -121,9 +121,8 @@ void setup() {
   //mySerial4.begin(19200);
 
   //fan
-  pinMode(fan_control_IN2_pin, OUTPUT);                     
-  pinMode(fan_control_ENA_pin, OUTPUT);  
-  digitalWrite(fan_control_IN2_pin, LOW);
+  pinMode(fan_control_M1A_pin, OUTPUT);  
+  digitalWrite(fan_control_M1A_pin, LOW);
 
   //main pump
   pinMode(main_pump_pin, OUTPUT);
@@ -535,37 +534,14 @@ void main_pump(){
 //---------------------------FANS------------------------------
 
 void fans() {
-/*  fan_speed = map(fan_speed_pct, 0, 100, 0, 255);                                    //convert % to the actual speed value
+fan_speed = map(fan_speed_pct, 0, 100, 0, 255);                                    //convert % to the actual speed value
 
-if (humidity >= humidity_highest && fan_speed_pct > 0) {
-    digitalWrite(fan_control_IN2_pin, HIGH); 
-    analogWrite(fan_control_ENA_pin, fan_speed );
-    Serial.println("  Fan speed set on " + (String)fan_speed_pct);
-  }
+if ((humidity_1 >= humidity_highest || humidity_2 >= humidity_highest) && (fan_speed_pct > 0)) {
+  analogWrite(fan_control_M1A_pin, fan_speed );
+  //Serial.println("  Fan speed set on " + (String)fan_speed_pct);
+} 
   else{
-    digitalWrite(fan_control_IN2_pin, LOW); 
-    Serial.println("  Fan OFF");
+    digitalWrite(fan_control_M1A_pin, LOW); 
+    //Serial.println("  Fan OFF");
   }
-}
-*/
-
-
-/*
-  if (fan_speed_pct > 0 && fan_speed_pct < 100){
-    digitalWrite(fan_control_IN2_pin, HIGH); 
-    analogWrite(fan_control_ENA_pin, fan_speed );
-    Serial.println("  Fan speed set on " + (String)fan_speed_pct);
-  }
-  else if (fan_speed_pct <= 0){
-    digitalWrite(fan_control_IN2_pin, LOW); 
-    Serial.println("  Fan OFF");
-  }
-  else{                                                    
-    fan_speed = 255;
-    digitalWrite(fan_control_IN2_pin, HIGH); 
-    analogWrite(fan_control_ENA_pin, fan_speed );
-    Serial.println("Fan's limit is 100%");
-  }
-*/
-
 }
