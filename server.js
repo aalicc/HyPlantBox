@@ -148,15 +148,15 @@ app.get('/values', async (req, res) => {
     res.json(response)
 })
 
-app.get('/control', (req,res) => {
+app.get('/control', checkAuthenticated, (req,res) => {
     res.render('control.ejs')
 })
 
 app.post('/control', async (req,res) => {
     try{
         dataFlag = true
-        let ruuvi1Q = await knex.ruuvidata('ruuvi1').max('time').select('Temp', 'Hum')
-        let stringy = 's, 70, 100, 3, 4, 5, 6, 7, 8' //settings have to be here instead of ruuvi data
+        let stringy = ' " ' + req.body.fanspeed + req.body.ontime + req.body.offtime + req.body.mntn + req.body.hph + req.body.hec + req.body.hhum + 
+        req.body.lph + req.body.lec + req.body.htemp + ' " ' //settings have to be here instead of ruuvi data
         let arr = stringy.split(',') //to send humidity data constantly a loop is needed which will be paused for the duration of this here post route function
         let i = 0
         console.log(arr)

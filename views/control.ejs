@@ -5,9 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign in</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
     <style>
       .green-bg {
       background-color: #4aa96c;
+    }
+
+    /* Styles for screens smaller than or equal to 576px */
+    @media (max-width: 576px) {
+      /* CSS rules for small screens */
+      body {
+        font-size: 5vh;
+        font-family: 'Bahnschrift', sans-serif;
+      }
+    }
+
+    /* Styles for screens between 577px and 992px */
+    @media (min-width: 577px) and (max-width: 900px) {
+      /* CSS rules for medium screens */
+      body {
+        font-size: 4vh;
+        font-family: 'Bahnschrift', sans-serif;
+      }
+    }
+
+    /* Styles for screens larger than or equal to 993px */
+    @media (min-width: 901px) {
+      /* CSS rules for large screens */
+      body {
+        font-size: 2.6vh;
+        font-family: 'Bahnschrift', sans-serif;
+      }
     }
     </style>
   </head>
@@ -38,24 +66,38 @@
     </nav>
     <div class="container-fluid">
       <div class="row">
-        <div class="col-4 m-3">
+        <div class="col-11 col-lg-4 m-3">
           <label for="fanspeed" class="form-label">Fan speed</label>
-          <input type="range" class="form-range" min="0" max="100" step="10" id="fanspeed" name="fanspeed">
-          <input type="text" class="form-control" id="textInput1" value="">
+          <input type="range" class="form-range" min="0" max="100" step="10" id="fanspeed" name="fanspeed" onchange="showValue(this.value)">
+          <script>
+            function showValue(newValue){
+              document.getElementById("textInput1").value=newValue;
+              }
+          </script>
         </div>
       </div>
       <div class="row">
-        <div class="col-5 m-3"> <!-- Needs js here to work as intended -->
+        <div class="mx-3 col-3 col-lg-1">
+          <input type="text" class="form-control" id="textInput1" onchange="showValueBack(this.value)">
+          <script>
+            function showValueBack(newValue){
+              document.getElementById("fanspeed").value=newValue;
+            } //FYI all value names should be done, next step is string construction testing
+          </script>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-10 col-lg-5 m-3"> <!-- Needs js here to work as intended -->
           <label for="pumpUptime" class="form-label">Main pump cycle</label>
           <div class="d-flex flex-row">
             <p>On time</p>
-            <input type="text" class="form-control my-2" id="pumpUptime" placeholder="Time that pumps have to be on in minutes" value=""> 
+            <input type="text" class="form-control my-2" id="pumpUptime" placeholder="Time that pumps have to be on in minutes" value="" name="ontime"> 
           </div>
           <div class="d-flex flex-row">
             <p>Off time</p>
-            <input type="text" class="form-control my-2" id="pumpDowntime" placeholder="Time the pumps have to be off in minutes" value="">
+            <input type="text" class="form-control my-2" id="pumpDowntime" placeholder="Time the pumps have to be off in minutes" value="" name="offtime">
           </div>
-          <input type="checkbox" class="btn-check" id="maintenance" autocomplete="off">
+          <input type="checkbox" class="btn-check" id="maintenance" autocomplete="off" name="mntn">
           <label class="btn btn-outline-primary mt-2" for="maintenance">Maintenance mode</label>
         </div>
       </div>
@@ -64,19 +106,19 @@
           <label class="form-label">Preferences</label>
           <div class="d-flex flex-row gap-3">
             <p>Highest pH</p>
-            <input type="text" class="form-control my-2" id="maxpH" value="">
+            <input type="text" class="form-control my-2" id="maxpH" value="" name="hph">
             <p>Highest EC</p>
-            <input type="text" class="form-control my-2" id="maxEC" value="">
+            <input type="text" class="form-control my-2" id="maxEC" value="" name="hec">
             <p>Highest Hum%</p>
-            <input type="text" class="form-control my-2" id="maxHum" value="">
+            <input type="text" class="form-control my-2" id="maxHum" value="" name="hhum">
           </div>
           <div class="d-flex flex-row gap-3">
             <p>Lowest pH</p>
-            <input type="text" class="form-control my-2" id="minpH" value="">
+            <input type="text" class="form-control my-2" id="minpH" value="" name="lph">
             <p>Lowest EC</p>
-            <input type="text" class="form-control my-2" id="minEC" value="">
+            <input type="text" class="form-control my-2" id="minEC" value="" name="lec">
             <p>Highest t°</p>
-            <input type="text" class="form-control my-2" id="minHum" value="">
+            <input type="text" class="form-control my-2" id="minHum" value="" name="htemp">
           </div>
         </div>
       </div>
