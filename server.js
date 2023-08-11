@@ -194,10 +194,12 @@ app.post('/control', async (req,res) => {
     } 
 })
 
-/*app.delete('/logout', (req, res) => {
-    req.logOut()
-    res.redirect('/login')
-})*/
+app.get('/logout', checkAuthenticated, (req, res) => {
+    req.logOut(function(err) {
+        if (err) { return next(err); }
+        res.redirect('/')
+    })
+})
 
 const sendHumidity = async () => {
     let ruuvi1Q = await knex.ruuvidata('ruuvi1').max('time').select('Temp', 'Hum')
@@ -205,7 +207,7 @@ const sendHumidity = async () => {
     let stringy = 'r, ' + ruuvi1Q[0].Temp + ', ' + ruuvi1Q[0].Hum + ', ' + ruuviProQ[0].Temp + ', ' + ruuviProQ[0].Hum
     let arr1 = stringy.split(',')
     let i = 0
-    console.log(arr1)
+    //console.log(arr1)
     setInterval(() => {
         if (i <= 4){ //replace with amount of parameteres -1 so that the app does not crash
             port.write(arr1[i], (err) => {
