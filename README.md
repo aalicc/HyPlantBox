@@ -1,5 +1,5 @@
 # HyPlantBox!
 HyPlantBox! is a hydroponic growing system for plants originated from https://github.com/embedded-sergey/innoproject
-<br />What's cool about it? You can adjust it to your needs! Functionality and expenses are up to you, just change/add state in the state machine. 
-
-In our system CONTROLLINO MAXI is the brain, and Raspberry Pi is giving it orders.
+<br />What's cool about it? You can adjust it to your needs! Functionality and expenses are up to you, just change/add state in the state machine. In our system CONTROLLINO MAXI is the brain, and Raspberry Pi is giving it orders.
+<br />
+The system includes typical sensors used for water and air quality monitoring i.e, pH, EC, temperature and humidity meters. These in turn are responsible for triggering the activation of mechanical devices, such as pumps and fans. The significance of pumps lies not only in delivering water to the growing channels but also in dispensing the necessary nutrients automatically. 
