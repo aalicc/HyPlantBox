@@ -131,7 +131,7 @@ app.post('/register', async (req,res) => {
     }
 })
 
-app.get('/values', async (req, res) => {
+app.get('/values', async (req, res) => { //change the order of items
     let ruuvi1Q = await knex.ruuvidata('ruuvi1').max('time').select('Temp', 'Hum')
     let ruuviProQ = await knex.ruuvidata('ruuviPro').max('time').select('Temp', 'Hum')
     let ruuviValues = ruuvi1Q[0].Temp + '&' + ruuviProQ[0].Temp + 
