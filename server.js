@@ -118,12 +118,14 @@ app.get('/register', (req,res) =>{
 
 app.post('/register', async (req,res) => {
     try {
+        dataFlag = true
         const hashedPassword = await bcrypt.hash(req.body.password, 10)
         await knex.createThingy(knex.usersdb, 'userCredentials',{
             id: Date.now().toString(),
             email: req.body.email,
             password: hashedPassword
         })
+        dataFlag = false
         res.redirect('/login')
     } catch {
         res.redirect('/register')
@@ -139,7 +141,7 @@ app.get('/values', async (req, res) => { //change the order of items //WARNING: 
     if (valuesCon !== undefined) {
     values += valuesCon.toString();
     } 
-    console.log(values)
+    //console.log(values)
     const response = {
         value: values
     }

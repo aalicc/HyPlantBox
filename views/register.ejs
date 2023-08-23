@@ -28,26 +28,38 @@
                   <form class="mx-1 mx-md-4">
   
                     <div class="form-floating">
-                        <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" name="email" required>
-                        <label for="floatingInput">Email address</label>
+                        <input type="email" class="form-control" id="email" placeholder="name@example.com" name="email" required>
+                        <label for="email">Email address</label>
                       </div>
                     
   
                       <div class="form-floating">
-                        <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password" required>
-                        <label for="floatingPassword">Password</label>
+                        <input type="password" class="form-control" id="password" placeholder="Password" name="password" required>
+                        <label for="password">Password</label>
                       </div>
   
                       <div class="form-floating">
-                        <input type="password" class="form-control" id="floatingPassword1" placeholder="Password" name="password1" required>
-                        <label for="floatingPassword1">Repeat password</label>
+                        <input type="password" class="form-control" id="password1" placeholder="Password" name="password1" required>
+                        <label for="password1">Repeat password</label>
                       </div>
   
-                    <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                      <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+                    <div class="d-flex justify-content-center m-3">
+                      <button type="submit" class="w-100 btn btn-lg btn-danger" id="submit">Register</button>
                     </div>
   
                   </form>
+                  <script>
+                    const submit = document.getElementById("submit")
+                    const pwordInput = document.getElementById("password")
+                    const pword1Input = document.getElementById("password1")
+
+                    submit.addEventListener("click", function(event) {
+                        if (pwordInput.value !== pword1Input.value) {
+                            alert('Password do not match mate')
+                            event.preventDefault()
+                        }
+                    })
+                  </script>
   
                 </div>
               </div>

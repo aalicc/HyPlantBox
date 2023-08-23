@@ -79,7 +79,7 @@
       </div>
       <div class="row">
         <div class="mx-3 col-3 col-lg-1">
-          <input type="text" class="form-control" id="textInput1" onchange="showValueBack(this.value)">
+          <input type="text" class="form-control" id="textInput1" value="<%= stinger.length > 0 ? stinger[stinger.length - 1].fanspeed : '' %>" onchange="showValueBack(this.value)">
           <script>
             function showValueBack(newValue){
               document.getElementById("fanspeed").value=newValue;
