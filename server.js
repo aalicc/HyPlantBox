@@ -121,7 +121,6 @@ app.post('/register', async (req,res) => {
         const hashedPassword = await bcrypt.hash(req.body.password, 10)
         await knex.createThingy(knex.usersdb, 'userCredentials',{
             id: Date.now().toString(),
-            name: req.body.name,
             email: req.body.email,
             password: hashedPassword
         })
@@ -131,7 +130,7 @@ app.post('/register', async (req,res) => {
     }
 })
 
-app.get('/values', async (req, res) => { //change the order of items
+app.get('/values', async (req, res) => { //change the order of items //WARNING: if you send empty values from control page the website crashes
     let ruuvi1Q = await knex.ruuvidata('ruuvi1').max('time').select('Temp', 'Hum')
     let ruuviProQ = await knex.ruuvidata('ruuviPro').max('time').select('Temp', 'Hum')
     let ruuviValues = ruuvi1Q[0].Temp + '&' + ruuviProQ[0].Temp + 
