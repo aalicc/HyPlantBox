@@ -98,7 +98,9 @@ app.get('/', checkNotAuthenticated,(req, res) =>{
 })
 
 app.get('/home', checkAuthenticated, (req, res) =>{
-    res.render('index.ejs')
+    let name = req.user.name
+    console.log(name)
+    res.render('index.ejs', {name})
 })
 
 app.get('/login', checkNotAuthenticated, async (req,res) =>{
@@ -123,6 +125,7 @@ app.post('/register', async (req,res) => {
         await knex.createThingy(knex.usersdb, 'userCredentials',{
             id: Date.now().toString(),
             email: req.body.email,
+            name: req.body.name,
             password: hashedPassword
         })
         dataFlag = false

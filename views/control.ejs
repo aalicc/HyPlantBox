@@ -69,7 +69,7 @@
       <div class="row">
         <div class="col-11 col-lg-4 m-3">
           <label for="fanspeed" class="form-label">Fan speed</label>
-          <input type="range" class="form-range" min="0" max="100" step="10" id="fanspeed" name="fanspeed" onchange="showValue(this.value)">
+          <input type="range" class="form-range" min="0" max="100" step="10" id="fanspeed" name="fanspeed" onchange="showValue(this.value)" required>
           <script>
             function showValue(newValue){
               document.getElementById("textInput1").value=newValue;
@@ -79,7 +79,7 @@
       </div>
       <div class="row">
         <div class="mx-3 col-3 col-lg-1">
-          <input type="text" class="form-control" id="textInput1" value="<%= stinger.length > 0 ? stinger[stinger.length - 1].fanspeed : '' %>" onchange="showValueBack(this.value)">
+          <input type="text" class="form-control" id="textInput1" onchange="showValueBack(this.value)" required>
           <script>
             function showValueBack(newValue){
               document.getElementById("fanspeed").value=newValue;
@@ -92,13 +92,13 @@
           <label for="pumpUptime" class="form-label">Main pump cycle</label>
           <div class="d-flex flex-row">
             <p>On time</p>
-            <input type="text" class="form-control my-2" id="pumpUptime" placeholder="Time that pumps have to be on in minutes" value="" name="ontime"> 
+            <input type="text" class="form-control my-2" id="pumpUptime" placeholder="Time that pumps have to be on in minutes" value="" name="ontime" required> 
           </div>
           <div class="d-flex flex-row">
             <p>Off time</p>
-            <input type="text" class="form-control my-2" id="pumpDowntime" placeholder="Time the pumps have to be off in minutes" value="" name="offtime">
+            <input type="text" class="form-control my-2" id="pumpDowntime" placeholder="Time the pumps have to be off in minutes" value="" name="offtime" required>
           </div>
-          <input type="checkbox" class="btn-check" id="maintenance" autocomplete="off" name="mntn">
+          <input type="checkbox" class="btn-check" id="maintenance" autocomplete="off" name="mntn" required>
           <label class="btn btn-outline-primary mt-2" for="maintenance">Maintenance mode</label>
         </div>
       </div>
@@ -107,19 +107,19 @@
           <label class="form-label">Preferences</label>
           <div class="d-flex flex-row gap-3">
             <p>Highest pH</p>
-            <input type="text" class="form-control my-2" id="maxpH" value="" name="hph">
+            <input type="text" class="form-control my-2" id="maxpH" value="" name="hph" required>
             <p>Highest EC</p>
-            <input type="text" class="form-control my-2" id="maxEC" value="" name="hec">
+            <input type="text" class="form-control my-2" id="maxEC" value="" name="hec" required>
             <p>Highest Hum%</p>
-            <input type="text" class="form-control my-2" id="maxHum" value="" name="hhum">
+            <input type="text" class="form-control my-2" id="maxHum" value="" name="hhum" required>
           </div>
           <div class="d-flex flex-row gap-3">
             <p>Lowest pH</p>
-            <input type="text" class="form-control my-2" id="minpH" value="" name="lph">
+            <input type="text" class="form-control my-2" id="minpH" value="" name="lph" required>
             <p>Lowest EC</p>
-            <input type="text" class="form-control my-2" id="minEC" value="" name="lec">
+            <input type="text" class="form-control my-2" id="minEC" value="" name="lec" required>
             <p>Highest t°</p>
-            <input type="text" class="form-control my-2" id="minHum" value="" name="htemp">
+            <input type="text" class="form-control my-2" id="minHum" value="" name="htemp" required>
           </div>
         </div>
       </div>
