@@ -159,14 +159,14 @@ app.get('/control', checkAuthenticated, (req,res) => {
 app.post('/control', async (req,res) => {
     try{
         dataFlag = true
-        let stringy = ' " ' + req.body.fanspeed + req.body.ontime + req.body.offtime + req.body.mntn + req.body.hph + req.body.hec + req.body.hhum + 
-        req.body.lph + req.body.lec + req.body.htemp + ' " ' //settings have to be here instead of ruuvi data
+        let stringy = '"' + req.body.fanspeed + ',' + req.body.ontime + ',' + req.body.offtime + ',' + req.body.mntn + ','
+        + req.body.hph + ',' + req.body.hec + ',' + req.body.hhum + ',' + req.body.lph + ',' + req.body.lec + ',' + req.body.htemp + '"' //settings have to be here instead of ruuvi data
         let arr = stringy.split(',') //to send humidity data constantly a loop is needed which will be paused for the duration of this here post route function
         let i = 0
-        console.log(arr)
+        console.log(arr + 'here')
         clearInterval(interval1)
         setInterval(() => {
-            if (i <= 8){ //replace with amount of parameteres -1 so that the app does not crash
+            if (i <= 9){ //replace with amount of parameteres -1 so that the app does not crash
                 port.write(arr[i], (err) => {
                     if (err) {
                         console.log('Didnt work')
@@ -213,7 +213,7 @@ const sendHumidity = async () => {
     let i = 0
     //console.log(arr1)
     setInterval(() => {
-        if (i <= 4){ //replace with amount of parameteres -1 so that the app does not crash
+        if (i <= 4){ //replace with amount of parameteres -1 so that the app does not crash //VALUE SHOULD REMAIN AT 4 DO NOT CHANGE
             port.write(arr1[i], (err) => {
                 if (err) {
                     console.log('Didnt work')

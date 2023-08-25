@@ -1,2 +1,5 @@
 .env
 node_modules
+views/extras/bootstrap.min.css
+views/extras/bootstrap.bundle.min.js
+views/extras/jquery-3.7.0.slim.js
