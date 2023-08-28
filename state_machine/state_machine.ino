@@ -290,7 +290,7 @@ void displayState(String currentState) {
   }
 }
 
-//-------------------------SETTINGS----------------------------
+//-------------------------RASPBERRY PI----------------------------
 
 //USER'S SELECTION ON THE CONTROL PANEL:
 //min & max amount of nutrients in the main tank (checkup)
@@ -309,7 +309,12 @@ float main_pump_off_min = 0;
 //incoming data from Raspberry Pi is in the String format
 String fan_speed_pct_pi, pH_lowest_pi, pH_highest_pi, EC_lowest_pi, EC_highest_pi, humidity_highest_pi, main_pump_on_min_pi, main_pump_off_min_pi, humidity_1_ruuvi, humidity_2_ruuvi;
 
-void Pi_communication(){
+void Pi_send(){
+String sensor_data = (String)water_level_1 + "&" + (String)water_level_2 + "&" +(String)water_level_3 + "&" + (String)water_level_4 + "&" + (String)water_level_5 + "&" + (String)temperature_C + "&" + (String)pH_compensated + "&" + (String)EC_average + "&" + (String)fan_speed_pct + "&" + (String)pump_status;
+Serial1.println(sensor_data);
+}
+
+void Pi_receive(){
   if (Serial1.available()){
     if ((Serial1.readString() == "s")){
       for (int i = 1; i <= 8; i++){
@@ -360,15 +365,6 @@ String humidity_2_ruuvi = get_ruuvi[4];
 humidity_2 = humidity_2_ruuvi.toFloat(); 
 }
 
-/*void maintenance_mode(){
-  while (button is pressed){
-    digitalWrite(fan_control_IN2_pin, LOW); 
-    digitalWrite(main_pump_pin, LOW);
-    digitalWrite(dose_pump_12V_pin_1, LOW);
-    digitalWrite(dose_pump_12V_pin_2, LOW);
-  }
-}
-*/
 
 //------------------SENSORS & OUTPUT DEVICES-------------------
 
@@ -396,8 +392,8 @@ Serial.println("  Distance 1 in cm: " + (String)distance_1);
 Serial.println("  Distance 2 in cm: " + (String)distance_2);  
 //PRINT DISTANCE IN %
 //map(real distance, min distance, max distance, min distance in %, max distance in %)
-water_level_1 = map(distance_1, 0, 62, 0, 100);               
-water_level_2 = map(distance_2, 0, 62, 0, 100);      
+water_level_1 = map(distance_1, 0, 33, 0, 100);               
+water_level_2 = map(distance_2, 0, 33, 0, 100);      
 //water_level_3 = map(distance_1, 0, 62, 0, 100);               
 //water_level_4 = map(distance_2, 0, 62, 0, 100);       
 //water_level_5 = map(distance_2, 0, 62, 0, 100);    
