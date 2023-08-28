@@ -40,12 +40,12 @@
     }
     </style>
   </head>
-<form action="/control" method="POST">
+<form action="/control" method="POST" onsubmit="saveData(event)">
   <body>
     <nav class="navbar navbar-expand-lg green-bg">
       <div class="container-fluid">
         <a class="navbar-brand" href="/home"> 
-          <img src="extras/logo.PNG" class="mb-1" width="75px" height="25px">
+          <img src="extras/home.png" class="mb-1" width="33px" height="25px">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -104,15 +104,9 @@
             $(document).ready(function(){
               $('#maintenance').click(function(){
                 if($(this).is(':checked')) {
-                  $('input[type="range"]').removeAttr('required');
-                  $('input[type="number"]').removeAttr('required');
                   $('input[type="number"]').val('0');
                   $('input[type="range"]').val('0');
-                  $('input[type="checkbox"]').val('1');
-                } else {
-                  $('input[type="range"]').attr('required', true);
-                  $('input[type="number"]').attr('required', true);
-                  $('input[type="checkbox"]').val('0');
+                  $(this).val(1);
                 }
               })
             })
@@ -142,6 +136,33 @@
       </div>
       <button class="m-3 btn btn-lg btn-primary" type="submit">Save</button>
     </div>
+    <script>
+      function saveData(event){
+        let form = event.target
+
+        for (let i = 0; i < form.elements.length; i++) {
+          let element = form.elements[i]
+          if (element.nodeName === 'INPUT'){
+            localStorage.setItem(element.name, element.value)
+          }
+        }
+
+        form.submit()
+      }
+
+      window.addEventListener('load', function() {
+        let form = document.querySelector('form')
+        for(let i = 0; i < form.elements.length; i++) {
+          let element = form.elements[i]
+          if (element.nodeName === 'INPUT') {
+            let savedValue = localStorage.getItem(element.name)
+            if (savedValue !== null) {
+              element.value = savedValue
+            }
+          }
+        }
+      })
+    </script>
     </body>
 </form>
 </html>
