@@ -11,13 +11,12 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center; /*might be important*/
+      justify-content: center; 
       font-weight: light;
     }
     
     .alerts {
-      min-height: 8.2vh;
-      height: 13vh;
+      min-height: 20vh;
       display: flex;
       flex-direction: row;
       align-items: center;
@@ -102,7 +101,7 @@
       background-color: #fd5e53;
     }
   </style>
-  <title>Hydroboxxx</title>
+  <title>Hydrobox UI</title>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 
@@ -110,7 +109,7 @@
   <nav class="navbar navbar-expand-lg green-bg">
     <div class="container-fluid">
       <a class="navbar-brand" href="/home"> 
-        <h1 class="fs-5" style="color:aliceblue">Hy<%= name %>! ☘️</h1>
+        <h1 class="fs-5" style="color:aliceblue">Hy<%= name %>!</h1>
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -134,7 +133,7 @@
     <div class="row g-0">
       <div class="col">
         <div class="window purple-bg">
-          Water lvl
+          Main tank
           <div style="display: flex;">
             <span class="fs-4" id="wlvl"></span>
             <span class="fs-4">%</span> 
@@ -210,14 +209,14 @@
           Pump
           <div style="display: flex;">
             <span class="fs-4" id="pump"></span>
-            <span class="fs-4">%</span>
+            <span class="fs-4"></span>
           </div>
         </div>
       </div>  
     </div>
-    <div class="row">
+    <div class="row g-0">
       <div class="alerts alerts-bg fs-5" id="status">
-        Status:&nbsp;
+        Alerts:&nbsp;
         <span id="alerts"></span> 
       </div>
     </div>
@@ -248,7 +247,7 @@
           const pump = document.getElementById('pump')
           const alerts = document.getElementById('alerts')
 
-          const arr = data.value.split('&')
+          const arr = data.value.split('&') //first 4 values after ruuvi values are reserved for alerts
           
           if (airtemp) {
             airtemp.textContent = arr[0] //wrong
@@ -263,35 +262,43 @@
             rh1.textContent = arr[3] //also wrong, will likely not work
           }
           if (wlvl) {
-            wlvl.textContent = arr[4]
+            wlvl.textContent = arr[8] //wrong numbers in the queue
           }
           if (wtemp) {
-            wtemp.textContent = arr[5]
+            wtemp.textContent = arr[9]
           }
-          
           if (vent) {
-            vent.textContent = arr[6]
+            vent.textContent = arr[12]
           }
           if (ph) {
-            ph.textContent = arr[7]
+            ph.textContent = arr[10]
           }
           if (ec) {
-            ec.textContent = arr[8]
+            ec.textContent = arr[11]
           }
           if (pump) {
-            pump.textContent = arr[9]
+            pump.textContent = arr[13]
           }
         
           if (alerts) {
-            if (arr[4] < 20 && arr[4] != ''){
+            if (arr[8] < 20 && arr[8] != ''){
               alerts.textContent = ' Water level low'
               document.getElementById('status').classList.add('alertsRed-bg') 
-            } else if (arr[4] > 90){
-              alerts.textContent = ' Water level high(potentially too high)'
-              document.getElementById('status').classList.add('alertsRed-bg') 
-            } else if (!arr[4]){
+            } else if (!arr[8]){
               alerts.textContent = ' No data received from Controllino'
               document.getElementById('status').classList.add('alertsRed-bg') 
+            } else if (arr[4] <= 40){
+              alerts.textContent = ' Ph up solution ' + arr[4] + '%'
+              document.getElementById('status').classList.add('alertsRed-bg')
+            } else if (arr[5] <= 40){
+              alerts.textContent = ' Ph down solution ' + arr[5] + '%'
+              document.getElementById('status').classList.add('alertsRed-bg')
+            } else if (arr[6] <= 40){
+              alerts.textContent = ' EC up solution ' + arr[6] + '%'
+              document.getElementById('status').classList.add('alertsRed-bg')
+            } else if (arr[7] <= 40){
+              alerts.textContent = ' EC down solution ' + arr[7] + '%'
+              document.getElementById('status').classList.add('alertsRed-bg')
             } else {
               document.getElementById('status').classList.remove('alertsRed-bg') 
               alerts.textContent = ' No alerts'

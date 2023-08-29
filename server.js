@@ -63,6 +63,7 @@ port.open((err) => {
       // Read data from the serial port
       parser.on('data', (line) => {
         valuesCon = line
+        console.log(valuesCon)
       })
       const sendData = 'Hello, Controllino!'
       port.write(sendData, (err) => {
@@ -144,7 +145,7 @@ app.get('/values', async (req, res) => { //change the order of items //WARNING: 
     if (valuesCon !== undefined) {
     values += valuesCon.toString();
     } 
-    //console.log(values)
+    console.log(values)
     const response = {
         value: values
     }
@@ -163,17 +164,17 @@ app.post('/control', async (req,res) => {
         + req.body.hph + ',' + req.body.hec + ',' + req.body.hhum + ',' + req.body.lph + ',' + req.body.lec + ',' + req.body.htemp //settings have to be here instead of ruuvi data
         let arr = stringy.split(',') //to send humidity data constantly a loop is needed which will be paused for the duration of this here post route function
         let i = 0
-        console.log(arr + 'here')
+        //console.log(arr + 'here')
         clearInterval(interval1)
         setInterval(() => {
             if (i <= 9){ //replace with amount of parameteres -1 so that the app does not crash
                 port.write(arr[i], (err) => {
                     if (err) {
-                        console.log('Didnt work')
+                        //console.log('Didnt work')
                     }
                     else {
-                        console.log('Succccess')
-                        console.log(arr[i])
+                       // console.log('Succccess')
+                        //console.log(arr[i])
                         i++
                     }
                 })
@@ -216,11 +217,11 @@ const sendHumidity = async () => {
         if (i <= 4){ //replace with amount of parameteres -1 so that the app does not crash //VALUE SHOULD REMAIN AT 4 DO NOT CHANGE
             port.write(arr1[i], (err) => {
                 if (err) {
-                    console.log('Didnt work')
+                    //console.log('Didnt work')
                 }
                 else {
-                    console.log('Succccess')
-                    console.log(arr1[i])
+                    //console.log('Succccess')
+                    //console.log(arr1[i])
                     i++
                 }
             })
