@@ -42,7 +42,7 @@ interval1 = setInterval(() => {
     if (!dataFlag){
         sendHumidity()
     }
-}, 5000)
+}, 100)
 
 
 //serial connection
@@ -63,16 +63,16 @@ port.open((err) => {
       // Read data from the serial port
       parser.on('data', (line) => {
         valuesCon = line
-        console.log(valuesCon)
+        //console.log(valuesCon)
       })
-      const sendData = 'Hello, Controllino!'
+     /* const sendData = 'Hello, Controllino!'
       port.write(sendData, (err) => {
         if (err) {
           console.error('Error writing to port:', err)
         } else {
           console.log('Sent:', sendData)
         }
-      })
+      })*/
     }
 })
 
@@ -160,8 +160,8 @@ app.get('/control', checkAuthenticated, (req,res) => {
 app.post('/control', async (req,res) => {
     try{
         dataFlag = true
-        let stringy = req.body.fanspeed + ',' + req.body.ontime + ',' + req.body.offtime + ','
-        + req.body.hph + ',' + req.body.hec + ',' + req.body.hhum + ',' + req.body.lph + ',' + req.body.lec + ',' + req.body.htemp //settings have to be here instead of ruuvi data
+        let stringy = 's' + ',' + req.body.fanspeed + ',' + req.body.lph + ',' + req.body.hph + ',' + req.body.lec + ',' + req.body.hec + 
+         ',' + req.body.ontime + ',' + req.body.offtime + ',' + req.body.hhum + ','  + req.body.htemp + 'o'//settings have to be here instead of ruuvi data
         let arr = stringy.split(',') //to send humidity data constantly a loop is needed which will be paused for the duration of this here post route function
         let i = 0
         //console.log(arr + 'here')
@@ -170,17 +170,17 @@ app.post('/control', async (req,res) => {
             if (i <= 9){ //replace with amount of parameteres -1 so that the app does not crash
                 port.write(arr[i], (err) => {
                     if (err) {
-                        //console.log('Didnt work')
+                        console.log('Didnt work')
                     }
                     else {
-                       // console.log('Succccess')
-                        //console.log(arr[i])
+                        console.log('Succccess')
+                        console.log(arr[i])
                         i++
                     }
                 })
             }
 
-        }, 58)
+        }, 150)
         i = 0
         res.redirect('/control')
         dataFlag = false
@@ -192,7 +192,7 @@ app.post('/control', async (req,res) => {
             if (!dataFlag){
                 sendHumidity()
             }
-        }, 5000)
+        }, 1000)
     }
     catch{
         res.redirect('/control')
@@ -212,21 +212,20 @@ const sendHumidity = async () => {
     let stringy = 'r, ' + ruuvi1Q[0].Temp + ', ' + ruuvi1Q[0].Hum + ', ' + ruuviProQ[0].Temp + ', ' + ruuviProQ[0].Hum
     let arr1 = stringy.split(',')
     let i = 0
-    //console.log(arr1)
     setInterval(() => {
         if (i <= 4){ //replace with amount of parameteres -1 so that the app does not crash //VALUE SHOULD REMAIN AT 4 DO NOT CHANGE
             port.write(arr1[i], (err) => {
                 if (err) {
-                    //console.log('Didnt work')
+                    console.log('Didnt work')
                 }
                 else {
-                    //console.log('Succccess')
-                    //console.log(arr1[i])
+                    console.log('Succccess')
+                    console.log(arr1[i])
                     i++
                 }
             })
         }
-    }, 58)
+    }, 200)
     i = 0
 }
 
