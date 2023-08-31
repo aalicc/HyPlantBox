@@ -43,8 +43,6 @@ int fan_speed;
 //fan controller MDD3A
 int fan_control_M1A_pin = 45;
 int fan_control_M2A_pin = 44;
-//int fan_control_IN2_pin = 16;                      //clockwise rotation pin
-//int fan_control_ENA_pin = 44;
 
 //raspberry Pi -> X1
 #define mySerial Serial1
@@ -124,6 +122,8 @@ void setup() {
   //fan
   pinMode(fan_control_M1A_pin, OUTPUT);  
   digitalWrite(fan_control_M1A_pin, LOW);
+  pinMode(fan_control_M2A_pin, OUTPUT);  
+  digitalWrite(fan_control_M2A_pin, LOW);
 
   //main pump
   pinMode(main_pump_pin, OUTPUT);
@@ -320,76 +320,52 @@ char *delim = ",";
 float token_float;
 
   if (Serial1.available()){
-    String pi_string = Serial1.readString();          //read data from Pi as a single string
-    if (pi_string.indexOf("r") != -1){                //continue if first character in string is "r"
-      pi_string.toCharArray(ruuvi_chars, 30);         //previously received string to char array
-      char *token = strtok(ruuvi_chars, delim);       //splits char array to separate values for later use
+      String pi_string = Serial1.readString();          //read data from Pi as a single string
+      if (pi_string.indexOf("r") != -1){                //continue if first character in string is "r"
+        pi_string.toCharArray(ruuvi_chars, 30);         //previously received string to char array
+        char *token = strtok(ruuvi_chars, delim);       //splits char array to separate values for later use
 
-      for (int i = 1; i < 5; i++){                    //creating an array of 5 elements considering delimeters
-        if (token != NULL){
-          token = strtok (NULL,delim);
-          token_float = atof(token);
-        }
-        //Serial.println(get_settings[i]);
-        get_ruuvi[i] = token_float;
-        Serial.println(get_ruuvi[i]);
-      }
-    }
-      else {                                          //same functionality as before, but the start letter is different
-        pi_string.toCharArray(control_chars, 30);
-        char *token = strtok(control_chars,delim);
-          for (int k = 1; k < 10; k ++){
-            if (token != NULL){
-              token = strtok (NULL,delim);
-              token_float = atof(token);
+        for (int i = 1; i < 5; i++){                    //creating an array of 5 elements considering delimeters
+          if (token != NULL){
+            token = strtok (NULL,delim);
+            token_float = atof(token);
           }
-          get_control[k] = token_float;
-          Serial.println(get_control[k]);        
+          get_ruuvi[i] = token_float;
+          Serial.println(get_ruuvi[i]);
+        }
       }
+        else {                                          //same functionality as before, but the start letter is different
+          pi_string.toCharArray(control_chars, 30);
+          char *token = strtok(control_chars,delim);
+            for (int k = 1; k < 10; k ++){
+              if (token != NULL){
+                token = strtok (NULL,delim);
+                token_float = atof(token);
+            }
+            get_control[k] = token_float;
+            Serial.println(get_control[k]);        
+        }
+    }
   }
-}
-}
 
-/*//convert received data to the right format
+//convert received data to the right format
 //settings from the control panel
-String fan_speed_pct_pi = get_settings[0];
-fan_speed_pct = fan_speed_pct_pi.toInt();
-
-String pH_lowest_pi = get_settings[1];
-pH_lowest = pH_lowest_pi.toFloat();
-
-String pH_highest_pi = get_settings[2];
-pH_highest = pH_highest_pi.toInt();
-
-String EC_lowest_pi = get_settings[3];
-EC_lowest = EC_lowest_pi.toFloat();
-
-String EC_highest_pi = get_settings[4];
-EC_highest = EC_highest_pi.toFloat(); 
-
-String humidity_highest_pi = get_settings[5];
-humidity_highest = humidity_highest_pi.toFloat(); 
-
-String temp_highest_pi = get_settings[6];
-temperature_highest = temp_highest_pi.toFloat(); 
-
-String main_pump_on_min_pi = get_settings[7];
-main_pump_on_min = main_pump_on_min_pi.toFloat(); 
-
-String main_pump_off_min_pi = get_settings[8];
-main_pump_off_min = main_pump_off_min_pi.toFloat();
+fan_speed_pct = get_control[1];
+pH_lowest = get_control[2];
+pH_highest = get_control[3];
+EC_lowest = get_control[4];
+EC_highest = get_control[5];
+main_pump_on_min = get_control[6];
+main_pump_off_min = get_control[7];
+humidity_highest = get_control[8];
+temperature_highest =  get_control[9];
 
 //data from Ruuvi
-String temperature_1_ruuvi = get_ruuvi[1];
-temperature_air_1 = temperature_1_ruuvi.toFloat(); 
-String humidity_1_ruuvi = get_ruuvi[2];
-humidity_1 = humidity_1_ruuvi.toFloat(); 
-String temperature_2_ruuvi = get_ruuvi[3];
-temperature_air_2 = temperature_2_ruuvi.toFloat(); 
-String humidity_2_ruuvi = get_ruuvi[4];
-humidity_2 = humidity_2_ruuvi.toFloat(); 
+temperature_air_1 = get_ruuvi[1];
+humidity_1 = get_ruuvi[2]; 
+temperature_air_2 = get_ruuvi[3];
+humidity_2 = get_ruuvi[4];
 }
-*/
 
 //------------------SENSORS & OUTPUT DEVICES-------------------
 
@@ -422,11 +398,11 @@ water_level_2 = map(distance_2, 0, 34, 100, 0);
 water_level_3 = map(distance_3, 0, 34, 100, 0);               
 water_level_4 = map(distance_4, 0, 34, 100, 0);       
 water_level_5 = map(distance_5, 0, 34, 100, 0);    
-Serial.println("  Distance in %: " + (String)water_level_1);
+/*Serial.println("  Distance in %: " + (String)water_level_1);
 Serial.println("  Distance in %: " + (String)water_level_2);
-//Serial.println("  Distance in %: " + (String)water_level_3);
-//Serial.println("  Distance in %: " + (String)water_level_4);
-//Serial.println("  Distance in %: " + (String)water_level_5);
+Serial.println("  Distance in %: " + (String)water_level_3);
+Serial.println("  Distance in %: " + (String)water_level_4);
+Serial.println("  Distance in %: " + (String)water_level_5);*/
 }
 
 //--------------------DS18B20 One wire--------------------
@@ -543,10 +519,12 @@ fan_speed = map(fan_speed_pct, 0, 100, 0, 255);                                 
 
 if ((humidity_1 >= humidity_highest || humidity_2 >= humidity_highest) && (fan_speed_pct > 0)) {
   analogWrite(fan_control_M1A_pin, fan_speed );
+  analogWrite(fan_control_M2A_pin, fan_speed );
   //Serial.println("  Fan speed set on " + (String)fan_speed_pct);
 } 
   else{
     digitalWrite(fan_control_M1A_pin, LOW); 
+    digitalWrite(fan_control_M2A_pin, LOW); 
     //Serial.println("  Fan OFF");
   }
 }
