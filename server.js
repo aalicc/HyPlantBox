@@ -42,7 +42,7 @@ interval1 = setInterval(() => {
     if (!dataFlag){
         sendHumidity()
     }
-}, 100)
+}, 10000) //SHOULD BE MORE THAN THE STATE MACHINE TAKES OVERALL
 
 
 //serial connection
@@ -161,27 +161,20 @@ app.post('/control', async (req,res) => {
     try{
         dataFlag = true
         let stringy = 's' + ',' + req.body.fanspeed + ',' + req.body.lph + ',' + req.body.hph + ',' + req.body.lec + ',' + req.body.hec + 
-         ',' + req.body.ontime + ',' + req.body.offtime + ',' + req.body.hhum + ','  + req.body.htemp + 'o'//settings have to be here instead of ruuvi data
+         ',' + req.body.ontime + ',' + req.body.offtime + ',' + req.body.hhum + ','  + req.body.htemp//settings have to be here instead of ruuvi data
         let arr = stringy.split(',') //to send humidity data constantly a loop is needed which will be paused for the duration of this here post route function
-        let i = 0
         //console.log(arr + 'here')
         clearInterval(interval1)
-        setInterval(() => {
-            if (i <= 9){ //replace with amount of parameteres -1 so that the app does not crash
-                port.write(arr[i], (err) => {
+                port.write(stringy, (err) => {
                     if (err) {
                         console.log('Didnt work')
                     }
                     else {
                         console.log('Succccess')
-                        console.log(arr[i])
-                        i++
+                        console.log(arr)
                     }
                 })
-            }
 
-        }, 150)
-        i = 0
         res.redirect('/control')
         dataFlag = false
 
@@ -192,7 +185,7 @@ app.post('/control', async (req,res) => {
             if (!dataFlag){
                 sendHumidity()
             }
-        }, 1000)
+        }, 10000)
     }
     catch{
         res.redirect('/control')
@@ -211,22 +204,15 @@ const sendHumidity = async () => {
     let ruuviProQ = await knex.ruuvidata('ruuviPro').max('time').select('Temp', 'Hum')
     let stringy = 'r, ' + ruuvi1Q[0].Temp + ', ' + ruuvi1Q[0].Hum + ', ' + ruuviProQ[0].Temp + ', ' + ruuviProQ[0].Hum
     let arr1 = stringy.split(',')
-    let i = 0
-    setInterval(() => {
-        if (i <= 4){ //replace with amount of parameteres -1 so that the app does not crash //VALUE SHOULD REMAIN AT 4 DO NOT CHANGE
-            port.write(arr1[i], (err) => {
+            port.write(stringy, (err) => {
                 if (err) {
                     console.log('Didnt work')
                 }
                 else {
                     console.log('Succccess')
-                    console.log(arr1[i])
-                    i++
+                    console.log(stringy)
                 }
             })
-        }
-    }, 200)
-    i = 0
 }
 
 function checkAuthenticated(req, res, next) {
