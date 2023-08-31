@@ -9,6 +9,8 @@
 #include <DallasTemperature.h>
 #include "DFRobot_PH.h"
 #include <EEPROM.h>
+#include <string.h>
+#include <stdlib.h>
 
 //--------------------------PINOUT------------------------------
 
@@ -45,7 +47,7 @@ int fan_control_M2A_pin = 44;
 //int fan_control_ENA_pin = 44;
 
 //raspberry Pi -> X1
-#define mySerial raspberry_Pi;
+#define mySerial Serial1
 
 //--------------------------RELAYS-----------------------------
 
@@ -89,15 +91,14 @@ unsigned long previous_millis = 0;                    //timer settings
 bool pump_status = false;                             //current condition of the pump (false == LOW, true == HIGH)
 
 //raspberry Pi
-String get_settings[10];                              //settings from the control panel
-String get_ruuvi[10];                                 //data from Ruuvi tags
+float get_control[10];                              //settings from the control panel
+float get_ruuvi[5];                                 //data from Ruuvi tags
 float humidity_1 = 0, humidity_2 = 0;
-float temperature_1 = 0, temperature_2 = 0;
+float temperature_air_1 = 0, temperature_air_2 = 0;
 
 //--------------------------SETUP------------------------------
 
 void setup() {
-
   //general
   Serial.begin(19200);
   sensors.begin();
@@ -129,7 +130,7 @@ void setup() {
   digitalWrite(main_pump_pin, LOW);
 
   //raspberry Pi
-  Serial1.setTimeout(100);                            //time for which Controllino receives the data set
+  mySerial.begin(19200);
 }
 
 //---------------------------LOOP------------------------------
@@ -141,24 +142,22 @@ void loop() {
 void stateMachine() {
   static unsigned long start_state_machine = millis();
 
-  static unsigned long start_idle = 1000;
-  static unsigned long start_water_level = 2000;
-  static unsigned long start_alarm = 2500;
+  static unsigned long start_idle = 2000;
+  static unsigned long start_water_level = 2500;
   static unsigned long start_temp = 3000;
   static unsigned long start_pH = 3500;
   static unsigned long start_EC = 4000;
   static unsigned long start_dose_pump_1 = 4500;
   static unsigned long start_dose_pump_2 = 5000;
-  static unsigned long start_dose_pump_3 = 5500;
-  static unsigned long start_dose_pump_4 = 6000;
-  static unsigned long start_main_pump = 6500;
-  static unsigned long start_fan_1 = 7000;
-  //static unsigned long start_fan_2 = 13000;
+  static unsigned long start_dose_pump_3 = 6500;
+  static unsigned long start_dose_pump_4 = 7000;
+  static unsigned long start_main_pump = 7500;
+  static unsigned long start_fans = 8000;
+  static unsigned long start_raspberry = 8500;
 
   enum class controllinoState : uint8_t {
     IDLE,
     WATER_LEVEL,
-    ALARM,
     WATER_TEMP,
     pH,
     EC,
@@ -168,7 +167,7 @@ void stateMachine() {
     DOSE_PUMP_4,
     MAIN_PUMP,
     FANS,
-    //RASPBERRY PI
+    RASPBERRY_PI,
   };
 
   static controllinoState currentState = controllinoState::IDLE;
@@ -186,14 +185,6 @@ void stateMachine() {
       if (millis() - start_state_machine >= start_water_level) {
         displayState("»»———-water level state———-««");
         water_level();
-        currentState = controllinoState::ALARM;
-      }
-      break;
-
-    case controllinoState::ALARM:
-      if (millis() - start_state_machine >= start_alarm) {
-        displayState("»»———-emergency state———-««");
-        alarm();
         currentState = controllinoState::WATER_TEMP;
       }
       break;
@@ -263,17 +254,23 @@ void stateMachine() {
       break;
 
       case controllinoState::FANS:
-      if (millis() - start_state_machine >= start_fan_1) {
+      if (millis() - start_state_machine >= start_fans) {
         displayState("»»———-fans state———-««");
         fans();
+        currentState = controllinoState::RASPBERRY_PI;
+      }
+      break;
+
+      case controllinoState::RASPBERRY_PI:
+      if (millis() - start_state_machine >= start_raspberry) {
+        displayState("»»———-Raspberry state———-««");
+        Pi_send();
+        Pi_receive();
         currentState = controllinoState::IDLE;
 
         start_state_machine = millis();  
       }
       break;
-
-      //Raspberry Pi
-      //maintenance mode
 
     default:
       // Nothing to do here
@@ -307,29 +304,53 @@ float main_pump_on_min = 0;
 float main_pump_off_min = 0;  
 
 //incoming data from Raspberry Pi is in the String format
-String fan_speed_pct_pi, pH_lowest_pi, pH_highest_pi, EC_lowest_pi, EC_highest_pi, humidity_highest_pi, main_pump_on_min_pi, main_pump_off_min_pi, humidity_1_ruuvi, humidity_2_ruuvi;
+String fan_speed_pct_pi, pH_lowest_pi, pH_highest_pi, EC_lowest_pi, EC_highest_pi, humidity_highest_pi, main_pump_on_min_pi, main_pump_off_min_pi, humidity_1_ruuvi, humidity_2_ruuvi, temperature_1_ruuvi, temperature_2_ruuvi;
 
 void Pi_send(){
+//upcoming data from CONTROLLINO
 String sensor_data = (String)water_level_1 + "&" + (String)water_level_2 + "&" +(String)water_level_3 + "&" + (String)water_level_4 + "&" + (String)water_level_5 + "&" + (String)temperature_C + "&" + (String)pH_compensated + "&" + (String)EC_average + "&" + (String)fan_speed_pct + "&" + (String)pump_status;
 Serial1.println(sensor_data);
 }
 
 void Pi_receive(){
+
+char ruuvi_chars[30];                                 //ruuvi values in char format
+char control_chars[60];                               //values from the control panel in char format
+char *delim = ",";
+float token_float;
+
   if (Serial1.available()){
-    if ((Serial1.readString() == "s")){
-      for (int i = 1; i <= 8; i++){
-        get_settings[i]= Serial1.readStringUntil("o");
-        //Serial.println(get_settings[i]); 
+    String pi_string = Serial1.readString();          //read data from Pi as a single string
+    if (pi_string.indexOf("r") != -1){                //continue if first character in string is "r"
+      pi_string.toCharArray(ruuvi_chars, 30);         //previously received string to char array
+      char *token = strtok(ruuvi_chars, delim);       //splits char array to separate values for later use
+
+      for (int i = 1; i < 5; i++){                    //creating an array of 5 elements considering delimeters
+        if (token != NULL){
+          token = strtok (NULL,delim);
+          token_float = atof(token);
+        }
+        //Serial.println(get_settings[i]);
+        get_ruuvi[i] = token_float;
+        Serial.println(get_ruuvi[i]);
       }
     }
-      else {
-        for (int k = 1; k <= 4; k++){
-        get_ruuvi[k] = Serial1.readString();
-        //Serial.println(get_ruuvi[k]);
+      else {                                          //same functionality as before, but the start letter is different
+        pi_string.toCharArray(control_chars, 30);
+        char *token = strtok(control_chars,delim);
+          for (int k = 1; k < 10; k ++){
+            if (token != NULL){
+              token = strtok (NULL,delim);
+              token_float = atof(token);
+          }
+          get_control[k] = token_float;
+          Serial.println(get_control[k]);        
       }
-    }
+  }
 }
-//convert received data to the right format
+}
+
+/*//convert received data to the right format
 //settings from the control panel
 String fan_speed_pct_pi = get_settings[0];
 fan_speed_pct = fan_speed_pct_pi.toInt();
@@ -359,12 +380,16 @@ String main_pump_off_min_pi = get_settings[8];
 main_pump_off_min = main_pump_off_min_pi.toFloat();
 
 //data from Ruuvi
+String temperature_1_ruuvi = get_ruuvi[1];
+temperature_air_1 = temperature_1_ruuvi.toFloat(); 
 String humidity_1_ruuvi = get_ruuvi[2];
 humidity_1 = humidity_1_ruuvi.toFloat(); 
+String temperature_2_ruuvi = get_ruuvi[3];
+temperature_air_2 = temperature_2_ruuvi.toFloat(); 
 String humidity_2_ruuvi = get_ruuvi[4];
 humidity_2 = humidity_2_ruuvi.toFloat(); 
 }
-
+*/
 
 //------------------SENSORS & OUTPUT DEVICES-------------------
 
@@ -383,41 +408,25 @@ void water_level(void) {
 }
 distance_1 = round(duration[0] * 0.034 / 2);            //common formula for distance calculation
 distance_2 = round(duration[1] * 0.034 / 2); 
-//distance_3 = round(duration[2] * 0.034 / 2);            
-//distance_4 = round(duration[3] * 0.034 / 2); 
-//distance_5 = round(duration[4] * 0.034 / 2); 
+distance_3 = round(duration[2] * 0.034 / 2);            
+distance_4 = round(duration[3] * 0.034 / 2); 
+distance_5 = round(duration[4] * 0.034 / 2); 
 
 //PRINT DISTANCE IN CM
 Serial.println("  Distance 1 in cm: " + (String)distance_1);
 Serial.println("  Distance 2 in cm: " + (String)distance_2);  
 //PRINT DISTANCE IN %
 //map(real distance, min distance, max distance, min distance in %, max distance in %)
-water_level_1 = map(distance_1, 0, 33, 0, 100);               
-water_level_2 = map(distance_2, 0, 33, 0, 100);      
-//water_level_3 = map(distance_1, 0, 62, 0, 100);               
-//water_level_4 = map(distance_2, 0, 62, 0, 100);       
-//water_level_5 = map(distance_2, 0, 62, 0, 100);    
+water_level_1 = map(distance_1, 0, 34, 100, 0);               
+water_level_2 = map(distance_2, 0, 34, 100, 0);      
+water_level_3 = map(distance_3, 0, 34, 100, 0);               
+water_level_4 = map(distance_4, 0, 34, 100, 0);       
+water_level_5 = map(distance_5, 0, 34, 100, 0);    
 Serial.println("  Distance in %: " + (String)water_level_1);
 Serial.println("  Distance in %: " + (String)water_level_2);
 //Serial.println("  Distance in %: " + (String)water_level_3);
 //Serial.println("  Distance in %: " + (String)water_level_4);
 //Serial.println("  Distance in %: " + (String)water_level_5);
-}
-
-//-----------------------Buzzer---------------------------
-
-void alarm(void) {
-  if ((water_level_1 <= 15) || (water_level_2 <= 15)){ //|| (water_level_3 <= 15) || (water_level_4 <= 15) || (water_level_5 <= 15)){
-    Serial.println("  Check the water tanks!");
-    tone(buzzer_pin, 40);
-    } else if ((water_level_1 <= 5) || (water_level_2 <= 5)){ //|| (water_level_3 <= 5) || (water_level_4 <= 5) || (water_level_5 <= 5)) {
-      Serial.println("  Emergency!");
-      tone(buzzer_pin, 40);
-      delay(200);
-      } else {
-        Serial.println("  OK.");
-        noTone(buzzer_pin);
-      }
 }
 
 //--------------------DS18B20 One wire--------------------
