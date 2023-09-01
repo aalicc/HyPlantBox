@@ -85,12 +85,12 @@ float EC_up_dosage = 5;
 float EC_down_dosage =5;
 
 //main pump cycle
-unsigned long previous_millis = 0;                    //timer settings
-bool pump_status = false;                             //current condition of the pump (false == LOW, true == HIGH)
+unsigned long previous_millis = 0;                   //timer settings
+bool pump_status = false;                            //current condition of the pump (false == LOW, true == HIGH)
 
 //raspberry Pi
-float get_control[10];                              //settings from the control panel
-float get_ruuvi[5];                                 //data from Ruuvi tags
+float get_control[10];                               //settings from the control panel
+float get_ruuvi[5];                                  //data from Ruuvi tags
 float humidity_1 = 0, humidity_2 = 0;
 float temperature_air_1 = 0, temperature_air_2 = 0;
 
@@ -102,7 +102,7 @@ void setup() {
   sensors.begin();
 
   //water level
-    for (int i = 0; i < 5 ; i++) {                    //declare all pins using for()
+    for (int i = 0; i < 5 ; i++) {                    //declare all pins using for() function
     pinMode(trig_pin[i], OUTPUT);
     pinMode(echo_pin[i], INPUT);}
 
@@ -313,37 +313,37 @@ Serial1.println(sensor_data);
 }
 
 void Pi_receive(){
-
-char ruuvi_chars[30];                                 //ruuvi values in char format
-char control_chars[60];                               //values from the control panel in char format
+char ruuvi_chars[30];                                   //ruuvi values in char format
+char control_chars[60];                                 //values from the control panel in char format
 char *delim = ",";
 float token_float;
 
   if (Serial1.available()){
       String pi_string = Serial1.readString();          //read data from Pi as a single string
-      if (pi_string.indexOf("r") != -1){                //continue if first character in string is "r"
-        pi_string.toCharArray(ruuvi_chars, 30);         //previously received string to char array
-        char *token = strtok(ruuvi_chars, delim);       //splits char array to separate values for later use
-
-        for (int i = 1; i < 5; i++){                    //creating an array of 5 elements considering delimeters
-          if (token != NULL){
-            token = strtok (NULL,delim);
-            token_float = atof(token);
-          }
-          get_ruuvi[i] = token_float;
-          Serial.println(get_ruuvi[i]);
-        }
-      }
-        else {                                          //same functionality as before, but the start letter is different
-          pi_string.toCharArray(control_chars, 30);
-          char *token = strtok(control_chars,delim);
-            for (int k = 1; k < 10; k ++){
+      if (pi_string.indexOf("s") != -1){                //continue if first character in string is "s"
+          pi_string.toCharArray(control_chars, 30);     //previously received string to char array
+          char *token = strtok(control_chars,delim);    //splits char array to separate values for later use
+            for (int k = 1; k < 10; k ++){              //creating an array of 10 elements considering delimeters
               if (token != NULL){
                 token = strtok (NULL,delim);
                 token_float = atof(token);
             }
             get_control[k] = token_float;
             Serial.println(get_control[k]);        
+        }
+      }
+        else {                     
+        //same functionality as before, but the start letter is different
+        pi_string.toCharArray(ruuvi_chars, 30);        
+        char *token = strtok(ruuvi_chars, delim);       
+
+        for (int i = 1; i < 5; i++){                    
+          if (token != NULL){
+            token = strtok (NULL,delim);
+            token_float = atof(token);
+          }
+          get_ruuvi[i] = token_float;
+          Serial.println(get_ruuvi[i]);
         }
     }
   }
@@ -373,7 +373,7 @@ humidity_2 = get_ruuvi[4];
 
 void water_level(void) {
   float water_level_sum_1 = 0, water_level_sum_2 = 0;
-  for (int i = 0; i < 5 ; i++) {                        //"i" = number of ultrasonic sensor used
+  for (int i = 0; i < 5 ; i++) {                          //"i" = number of ultrasonic sensor used
     digitalWrite(trig_pin[i], LOW);
     delayMicroseconds(2);
     digitalWrite(trig_pin[i], HIGH);
@@ -382,7 +382,7 @@ void water_level(void) {
     duration[i] = pulseIn(echo_pin[i], HIGH);
     delay(20);
 }
-distance_1 = round(duration[0] * 0.034 / 2);            //common formula for distance calculation
+distance_1 = round(duration[0] * 0.034 / 2);              //common formula for distance calculation
 distance_2 = round(duration[1] * 0.034 / 2); 
 distance_3 = round(duration[2] * 0.034 / 2);            
 distance_4 = round(duration[3] * 0.034 / 2); 
@@ -443,7 +443,7 @@ void EC_level(void) {
   Serial.println("  EC (mS/m): " + (String)EC_average);
 }
 
-//------------------Atlas Scientific SGL-PMP-BX----------------
+//--------------Atlas Scientific SGL-PMP-BX----------------
 
 void dose_pump_pH_up(void) {                               //pump 1
 if (pH_compensated < pH_lowest){
@@ -490,7 +490,7 @@ if (EC_average > EC_highest){
   }
 }
 
-//----------------------MAIN WATER PUMP------------------------
+//-----------------------MAIN WATER PUMP------------------------
 
 void main_pump(){
   float main_pump_on_ms = main_pump_on_min * 60000;                                     //convert user input from minutes to milliseconds
