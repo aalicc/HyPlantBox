@@ -277,7 +277,12 @@
             ec.textContent = arr[11]
           }
           if (pump) {
-            pump.textContent = arr[13]
+            if (arr[13] > 0){
+              pump.textContent = 'ON'
+            }
+            else{
+              pump.textContent = 'OFF'
+            }
           }
         
           if (alerts) {

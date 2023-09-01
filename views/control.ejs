@@ -104,9 +104,16 @@
             $(document).ready(function(){
               $('#maintenance').click(function(){
                 if($(this).is(':checked')) {
-                  $('input[type="number"]').val('0');
-                  $('input[type="range"]').val('0');
-                  $(this).val(1);
+                  $('#fanspeed').val('0');
+                  $('#fanspeed2').val('0');
+                  $('#pumpUptime').val('0');
+                  $('#pumpDowntime').val('300');
+                  $('#maxpH').val('20');
+                  $('#maxEC').val('1000');
+                  $('#maxHum').val('100');
+                  $('#minpH').val('0');
+                  $('#minEC').val('0');
+                  $('#maxTemp').val('100');
                 }
               })
             })
@@ -130,7 +137,7 @@
             <p>Lowest EC</p>
             <input type="number" class="form-control my-2" id="minEC" value="" name="lec" required>
             <p>Highest t°</p>
-            <input type="number" class="form-control my-2" id="minHum" value="" name="htemp" required>
+            <input type="number" class="form-control my-2" id="maxTemp" value="" name="htemp" required>
           </div>
         </div>
       </div>
