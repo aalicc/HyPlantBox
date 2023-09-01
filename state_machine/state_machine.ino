@@ -73,16 +73,16 @@ uint8_t sensor1[8] = {0x28, 0x12, 0xF2, 0x20, 0x0F, 0x00, 0x00, 0x21};
 //uint8_t sensor1[8] = { 0x28, 0x77, 0x07, 0x97, 0x94, 0x07, 0x03, 0x0F };
 //uint8_t sensor2[8] = { 0x28, 0x83, 0x53, 0x97, 0x94, 0x13, 0x03, 0xFC };
 
-//EC sensor
+//TDS sensor
 const float a = 0.020;
-float EC_average;                
+float TDS;                
 
 //dosing pumps
 //amount of nutrients to add (in milliliters)
 float pH_up_dosage = 5;                                     
 float pH_down_dosage = 5;
-float EC_up_dosage = 5;
-float EC_down_dosage =5;
+float TDS_up_dosage = 5;
+float TDS_down_dosage =5;
 
 //main pump cycle
 unsigned long previous_millis = 0;                   //timer settings
@@ -146,7 +146,7 @@ void stateMachine() {
   static unsigned long start_water_level = 2500;
   static unsigned long start_temp = 3000;
   static unsigned long start_pH = 3500;
-  static unsigned long start_EC = 4000;
+  static unsigned long start_TDS = 4000;
   static unsigned long start_dose_pump_1 = 4500;
   static unsigned long start_dose_pump_2 = 5000;
   static unsigned long start_dose_pump_3 = 6500;
@@ -160,7 +160,7 @@ void stateMachine() {
     WATER_LEVEL,
     WATER_TEMP,
     pH,
-    EC,
+    TDS,
     DOSE_PUMP_1,
     DOSE_PUMP_2,
     DOSE_PUMP_3,
@@ -201,14 +201,14 @@ void stateMachine() {
       if (millis() - start_state_machine >= start_pH) {
         displayState("»»———-pH level state———-««");
         pH_level();
-        currentState = controllinoState::EC;
+        currentState = controllinoState::TDS;
       }
       break;
 
-    case controllinoState::EC:
-      if (millis() - start_state_machine >= start_EC) {
-        displayState("»»———-EC state———-««");
-        EC_level();
+    case controllinoState::TDS:
+      if (millis() - start_state_machine >= start_TDS) {
+        displayState("»»———-TDS state———-««");
+        TDS_level();
         currentState = controllinoState::DOSE_PUMP_1;
       }
       break;
@@ -224,7 +224,7 @@ void stateMachine() {
       case controllinoState::DOSE_PUMP_2:
       if (millis() - start_state_machine >= start_dose_pump_2) {
         displayState("»»———-2nd dosing pump state———-««");
-        dose_pump_EC_up();
+        dose_pump_TDS_up();
         currentState = controllinoState::DOSE_PUMP_3;
       }
       break;
@@ -240,7 +240,7 @@ void stateMachine() {
       case controllinoState::DOSE_PUMP_4:
       if (millis() - start_state_machine >= start_dose_pump_4) {
         displayState("»»———-4th dosing pump state———-««");
-        dose_pump_EC_down();
+        dose_pump_TDS_down();
         currentState = controllinoState::MAIN_PUMP;
       }
       break;
@@ -293,8 +293,8 @@ void displayState(String currentState) {
 //min & max amount of nutrients in the main tank (checkup)
 float pH_lowest = 0;
 float pH_highest = 0;
-float EC_lowest = 0;
-float EC_highest = 0;
+float TDS_lowest = 0;
+float TDS_highest = 0;
 //fan default speed  0% - 100%
 int fan_speed_pct = 0; 
 int humidity_highest = 0;
@@ -304,11 +304,11 @@ float main_pump_on_min = 0;
 float main_pump_off_min = 0;  
 
 //incoming data from Raspberry Pi is in the String format
-String fan_speed_pct_pi, pH_lowest_pi, pH_highest_pi, EC_lowest_pi, EC_highest_pi, humidity_highest_pi, main_pump_on_min_pi, main_pump_off_min_pi, humidity_1_ruuvi, humidity_2_ruuvi, temperature_1_ruuvi, temperature_2_ruuvi;
+String fan_speed_pct_pi, pH_lowest_pi, pH_highest_pi, TDS_lowest_pi, TDS_highest_pi, humidity_highest_pi, main_pump_on_min_pi, main_pump_off_min_pi, humidity_1_ruuvi, humidity_2_ruuvi, temperature_1_ruuvi, temperature_2_ruuvi;
 
 void Pi_send(){
 //upcoming data from CONTROLLINO
-String sensor_data = (String)water_level_1 + "&" + (String)water_level_2 + "&" +(String)water_level_3 + "&" + (String)water_level_4 + "&" + (String)water_level_5 + "&" + (String)temperature_C + "&" + (String)pH_compensated + "&" + (String)EC_average + "&" + (String)fan_speed_pct + "&" + (String)pump_status;
+String sensor_data = (String)water_level_1 + "&" + (String)water_level_2 + "&" +(String)water_level_3 + "&" + (String)water_level_4 + "&" + (String)water_level_5 + "&" + (String)temperature_C + "&" + (String)pH_compensated + "&" + (String)TDS + "&" + (String)fan_speed_pct + "&" + (String)pump_status;
 Serial1.println(sensor_data);
 }
 
@@ -353,8 +353,8 @@ float token_float;
 fan_speed_pct = get_control[1];
 pH_lowest = get_control[2];
 pH_highest = get_control[3];
-EC_lowest = get_control[4];
-EC_highest = get_control[5];
+TDS_lowest = get_control[4];
+TDS_highest = get_control[5];
 main_pump_on_min = get_control[6];
 main_pump_off_min = get_control[7];
 humidity_highest = get_control[8];
@@ -416,7 +416,7 @@ void water_temp(void) {
 //--------------------DFRobot pH V2.0----------------------
 
 void pH_level(void) {
-  pH_voltage = analogRead(pH_pin)/1024.0*5000;            // read the voltage
+  pH_voltage = analogRead(pH_pin)/1024.0*5000;             // read the voltage
   pH_compensated = ph.readPH(pH_voltage, temperature_C);   // convert voltage to pH with temperature compensation
   //Serial.print("temperature:");
   //Serial.print(temperature_C,1);
@@ -426,22 +426,19 @@ void pH_level(void) {
 
 //-----------------------Grove TDS------------------------
 
-void EC_level(void) {
-  int TDS_raw;
-  float EC_voltage = 0, TDS_25 = 0, EC_25, EC_sum = 0, EC;
+void TDS_level(void) {
+  float TDS_raw, TDS_volt = 0, TDS_raw_sum = 0, TDS_raw_average = 0, TDS, temp_comp;
+  
+  temp_comp = (1 + a * (temperature_C - 25.0));                                                               //t° compensation formula
   for (int i = 0; i < 5; i++) {
     TDS_raw = analogRead(TDS_pin);
-    EC_voltage = TDS_raw * 5 / 1024.0;
-    //voltage to TDS ->
-    TDS_25 = (133.42 * EC_voltage * EC_voltage * EC_voltage - 255.86 * EC_voltage * EC_voltage + 857.39 * EC_voltage) * 0.5;
-    //TDS to EC ->
-    EC_25 = TDS_25 * 2;
-    EC = (1 + a * (temperature_C - 25)) * EC_25;           //t° compensation
-    EC_sum = EC_sum + EC;                                  //sum for the following average calculation
+    TDS_raw_sum = TDS_raw_sum + TDS_raw;                                                                      //get sum of received raw value from sensor for better accuracy
+  }  
+    TDS_raw_average = TDS_raw_sum / 5;
+    TDS_volt = (TDS_raw_average * 5 / 1024.0) / temp_comp;                                                    //converting raw value to voltage and applying temperature compensation formula
+    TDS = (133.42 / TDS_volt * TDS_volt * TDS_volt - 255.86 * TDS_volt * TDS_volt + 857.39 * TDS_volt) * 0.5; //voltage to TDS
+    Serial.println("  TDS (ppm): " + (String)TDS);
   }
-  EC_average = EC_sum / 5;                                 
-  Serial.println("  EC (mS/m): " + (String)EC_average);
-}
 
 //--------------Atlas Scientific SGL-PMP-BX----------------
 
@@ -456,11 +453,11 @@ if (pH_compensated < pH_lowest){
     Serial.println("  Pump 1 is sleeping...");
   }
 }
-void dose_pump_EC_up(void) {                               //pump 2
-if (EC_average < EC_lowest){
+void dose_pump_TDS_up(void) {                               //pump 2
+if (TDS < TDS_lowest){
   //SEND COMMAND IN ASCII (STRING)
-    mySerial2.println("d," + (String)EC_up_dosage);
-    Serial.println("  Pump 2 is raising the EC...");
+    mySerial2.println("d," + (String)TDS_up_dosage);
+    Serial.println("  Pump 2 is raising the TDS...");
   }
   else{
     mySerial2.println("d,Sleep");                          //enter low power mode
@@ -478,11 +475,11 @@ if (pH_compensated > pH_highest){
     Serial.println("  Pump 3 is sleeping...");
   }
 }
-void dose_pump_EC_down(void) {                               //pump 4
-if (EC_average > EC_highest){
+void dose_pump_TDS_down(void) {                               //pump 4
+if (TDS > TDS_highest){
   //SEND COMMAND IN ASCII (STRING)
-    //mySerial4.println("d," + (String)EC_down_dosage);
-    Serial.println("  Pump 4 is lowering the EC...");
+    //mySerial4.println("d," + (String)TDS_down_dosage);
+    Serial.println("  Pump 4 is lowering the TDS...");
   }
     else{
     //mySerial4.println("d,Sleep");                          //enter low power mode
