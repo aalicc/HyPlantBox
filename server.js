@@ -42,7 +42,7 @@ interval1 = setInterval(() => {
     if (!dataFlag){
         sendHumidity()
     }
-}, 10000) //SHOULD BE MORE THAN THE STATE MACHINE TAKES OVERALL
+}, 10000) //SHOULD BE MORE THAN THE STATE MACHINE STATE AND PREV STATES
 
 
 //serial connection
