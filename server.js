@@ -160,7 +160,7 @@ app.get('/control', checkAuthenticated, (req,res) => {
 app.post('/control', async (req,res) => {
     try{
         dataFlag = true
-        let stringy = 's' + ',' + req.body.fanspeed + ',' + req.body.lph + ',' + req.body.hph + ',' + req.body.lec + ',' + req.body.hec + 
+        let stringy = 's' + ',' + req.body.fanspeed + ',' + req.body.lph + ',' + req.body.hph + ',' + req.body.lTDS + ',' + req.body.hTDS + 
          ',' + req.body.ontime + ',' + req.body.offtime + ',' + req.body.hhum + ','  + req.body.htemp//settings have to be here instead of ruuvi data
         let arr = stringy.split(',') //to send humidity data constantly a loop is needed which will be paused for the duration of this here post route function
         //console.log(arr + 'here')

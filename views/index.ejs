@@ -184,10 +184,10 @@
       </div>
       <div class="col">
         <div class="window yellow-bg">
-          EC
+          TDS
           <div style="display: flex;">
-            <span class="fs-4" id="ec"></span>
-            <span class="fs-4">µS/cm</span>
+            <span class="fs-4" id="TDS"></span>
+            <span class="fs-4">ppm</span>
           </div>
         </div>
       </div>
@@ -241,7 +241,7 @@
           const airtemp1 = document.getElementById('airtemp1')
           const vent = document.getElementById('vent')
           const ph = document.getElementById('ph')
-          const ec = document.getElementById('ec')
+          const TDS = document.getElementById('TDS')
           const rh = document.getElementById('rh')
           const rh1 = document.getElementById('rh1')
           const pump = document.getElementById('pump')
@@ -250,19 +250,19 @@
           const arr = data.value.split('&') //first 4 values after ruuvi values are reserved for alerts
           
           if (airtemp) {
-            airtemp.textContent = arr[0] //wrong
+            airtemp.textContent = arr[0]
           }
           if (airtemp1) {
-            airtemp1.textContent = arr[1] //wrong
+            airtemp1.textContent = arr[1]
           }
           if (rh) {
-            rh.textContent = arr[2] //also wrong, will likely not work
+            rh.textContent = arr[2]
           }
           if (rh1) {
-            rh1.textContent = arr[3] //also wrong, will likely not work
+            rh1.textContent = arr[3]
           }
           if (wlvl) {
-            wlvl.textContent = arr[8] //wrong numbers in the queue
+            wlvl.textContent = arr[8]
           }
           if (wtemp) {
             wtemp.textContent = arr[9]
@@ -273,8 +273,8 @@
           if (ph) {
             ph.textContent = arr[10]
           }
-          if (ec) {
-            ec.textContent = arr[11]
+          if (TDS) {
+            TDS.textContent = arr[11]
           }
           if (pump) {
             if (arr[13] > 0){
@@ -299,10 +299,10 @@
               alerts.textContent = ' Ph down solution ' + arr[5] + '%'
               document.getElementById('status').classList.add('alertsRed-bg')
             } else if (arr[6] <= 40){
-              alerts.textContent = ' EC up solution ' + arr[6] + '%'
+              alerts.textContent = ' TDS up solution ' + arr[6] + '%'
               document.getElementById('status').classList.add('alertsRed-bg')
             } else if (arr[7] <= 40){
-              alerts.textContent = ' EC down solution ' + arr[7] + '%'
+              alerts.textContent = ' TDS down solution ' + arr[7] + '%'
               document.getElementById('status').classList.add('alertsRed-bg')
             } else {
               document.getElementById('status').classList.remove('alertsRed-bg') 
