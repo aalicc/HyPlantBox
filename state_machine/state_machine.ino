@@ -26,17 +26,17 @@ const byte temperature_pin = 53;
 
 //pH sensor -> X1
 const byte pH_pin = A1;
-float pH_voltage, pH_compensated;
+float pH_voltage, pH;
 DFRobot_PH ph;
 
 //TDS sensor -> X1                                  //mentined later as EC sensor
 const byte TDS_pin = A0;
 
 //Dosing pumps -> X2 
-  SoftwareSerial mySerial1(13, 43);                 //(rx, tx)
+  SoftwareSerial mySerial1(13, 43);                 //(rx, tx) = (SDA, SCL)
   SoftwareSerial mySerial2(11, 9);                  
-  //SoftwareSerial mySerial3(12, 42);               
-  //SoftwareSerial mySerial4(10, 8);                
+  SoftwareSerial mySerial3(12, 42);               
+  SoftwareSerial mySerial4(10, 8);                
 
 //fan
 int fan_speed;
@@ -52,6 +52,8 @@ int fan_control_M2A_pin = 44;
 //Dosing pumps -> Relay 1
 const byte dose_pump_12V_pin_1 = 23;
 const byte dose_pump_12V_pin_2 = 24;
+const byte dose_pump_12V_pin_3 = 25;
+const byte dose_pump_12V_pin_4 = 26;
 
 //Main pump -> Relay 8
 const byte main_pump_pin = 30;
@@ -69,9 +71,6 @@ float temperature_C;
 OneWire oneWire(temperature_pin);
 DallasTemperature sensors(&oneWire);
 uint8_t sensor1[8] = {0x28, 0x12, 0xF2, 0x20, 0x0F, 0x00, 0x00, 0x21};
-
-//uint8_t sensor1[8] = { 0x28, 0x77, 0x07, 0x97, 0x94, 0x07, 0x03, 0x0F };
-//uint8_t sensor2[8] = { 0x28, 0x83, 0x53, 0x97, 0x94, 0x13, 0x03, 0xFC };
 
 //TDS sensor
 const float a = 0.020;
@@ -114,10 +113,15 @@ void setup() {
   digitalWrite(dose_pump_12V_pin_1, HIGH);
   pinMode(dose_pump_12V_pin_2, OUTPUT);
   digitalWrite(dose_pump_12V_pin_2, HIGH);
+  pinMode(dose_pump_12V_pin_3, OUTPUT);
+  digitalWrite(dose_pump_12V_pin_3, HIGH);
+  pinMode(dose_pump_12V_pin_4, OUTPUT);
+  digitalWrite(dose_pump_12V_pin_4, HIGH);
+
   mySerial1.begin(19200);
   mySerial2.begin(19200);
-  //mySerial3.begin(19200);
-  //mySerial4.begin(19200);
+  mySerial3.begin(19200);
+  mySerial4.begin(19200);
 
   //fan
   pinMode(fan_control_M1A_pin, OUTPUT);  
@@ -142,6 +146,20 @@ void loop() {
 void stateMachine() {
   static unsigned long start_state_machine = millis();
 
+  static unsigned long start_idle = 1000;
+  static unsigned long start_water_level = 1500;
+  static unsigned long start_temp = 2000;
+  static unsigned long start_pH = 2500;
+  static unsigned long start_TDS = 3000;
+  static unsigned long start_dose_pump_1 = 3500;
+  static unsigned long start_dose_pump_2 = 4000;
+  static unsigned long start_dose_pump_3 = 4500;
+  static unsigned long start_dose_pump_4 = 5000;
+  static unsigned long start_main_pump = 5500;
+  static unsigned long start_fans = 5750;
+  static unsigned long start_raspberry = 6000;
+
+  /*
   static unsigned long start_idle = 2000;
   static unsigned long start_water_level = 2500;
   static unsigned long start_temp = 3000;
@@ -153,7 +171,7 @@ void stateMachine() {
   static unsigned long start_dose_pump_4 = 7000;
   static unsigned long start_main_pump = 7500;
   static unsigned long start_fans = 8000;
-  static unsigned long start_raspberry = 8500;
+  static unsigned long start_raspberry = 8500;*/
 
   enum class controllinoState : uint8_t {
     IDLE,
@@ -308,7 +326,7 @@ String fan_speed_pct_pi, pH_lowest_pi, pH_highest_pi, TDS_lowest_pi, TDS_highest
 
 void Pi_send(){
 //upcoming data from CONTROLLINO
-String sensor_data = (String)water_level_1 + "&" + (String)water_level_2 + "&" +(String)water_level_3 + "&" + (String)water_level_4 + "&" + (String)water_level_5 + "&" + (String)temperature_C + "&" + (String)pH_compensated + "&" + (String)TDS + "&" + (String)fan_speed_pct + "&" + (String)pump_status;
+String sensor_data = (String)water_level_1 + "&" + (String)water_level_2 + "&" +(String)water_level_3 + "&" + (String)water_level_4 + "&" + (String)water_level_5 + "&" + (String)temperature_C + "&" + (String)pH + "&" + (String)TDS + "&" + (String)fan_speed_pct + "&" + (String)pump_status;
 Serial1.println(sensor_data);
 }
 
@@ -326,7 +344,7 @@ float token_float;
             for (int k = 1; k < 10; k ++){              //creating an array of 10 elements considering delimeters
               if (token != NULL){
                 token = strtok (NULL,delim);
-                token_float = atof(token);
+                token_float = atof(token);              //char to float
             }
             get_control[k] = token_float;
             Serial.println(get_control[k]);        
@@ -388,17 +406,18 @@ distance_3 = round(duration[2] * 0.034 / 2);
 distance_4 = round(duration[3] * 0.034 / 2); 
 distance_5 = round(duration[4] * 0.034 / 2); 
 
-//PRINT DISTANCE IN CM
-Serial.println("  Distance 1 in cm: " + (String)distance_1);
-Serial.println("  Distance 2 in cm: " + (String)distance_2);  
-//PRINT DISTANCE IN %
 //map(real distance, min distance, max distance, min distance in %, max distance in %)
 water_level_1 = map(distance_1, 0, 34, 100, 0);               
 water_level_2 = map(distance_2, 0, 34, 100, 0);      
 water_level_3 = map(distance_3, 0, 34, 100, 0);               
 water_level_4 = map(distance_4, 0, 34, 100, 0);       
 water_level_5 = map(distance_5, 0, 34, 100, 0);    
-/*Serial.println("  Distance in %: " + (String)water_level_1);
+/*TEST
+//distance in cm 
+Serial.println("  Distance 1 in cm: " + (String)distance_1);
+Serial.println("  Distance 2 in cm: " + (String)distance_2); 
+//distance in %
+Serial.println("  Distance in %: " + (String)water_level_1);
 Serial.println("  Distance in %: " + (String)water_level_2);
 Serial.println("  Distance in %: " + (String)water_level_3);
 Serial.println("  Distance in %: " + (String)water_level_4);
@@ -417,17 +436,17 @@ void water_temp(void) {
 
 void pH_level(void) {
   pH_voltage = analogRead(pH_pin)/1024.0*5000;             // read the voltage
-  pH_compensated = ph.readPH(pH_voltage, temperature_C);   // convert voltage to pH with temperature compensation
+  pH = ph.readPH(pH_voltage, temperature_C);   // convert voltage to pH with temperature compensation
   //Serial.print("temperature:");
   //Serial.print(temperature_C,1);
   Serial.print("  pH: ");
-  Serial.println(pH_compensated,2);             
+  Serial.println(pH,2);             
 }
 
 //-----------------------Grove TDS------------------------
 
 void TDS_level(void) {
-  float TDS_raw, TDS_volt = 0, TDS_raw_sum = 0, TDS_raw_average = 0, TDS, temp_comp;
+  float TDS_raw, TDS_volt = 0, TDS_raw_sum = 0, TDS_raw_average = 0, temp_comp;
   
   temp_comp = (1 + a * (temperature_C - 25.0));                                                               //t° compensation formula
   for (int i = 0; i < 5; i++) {
@@ -443,7 +462,7 @@ void TDS_level(void) {
 //--------------Atlas Scientific SGL-PMP-BX----------------
 
 void dose_pump_pH_up(void) {                               //pump 1
-if (pH_compensated < pH_lowest){
+if (pH < pH_lowest){
   //SEND COMMAND IN ASCII (STRING)
   mySerial1.println("d,"+ (String)pH_up_dosage);           //dispose x milliliters -> D,X 
   Serial.println("  Pump 1 is raising the pH...");
@@ -465,24 +484,24 @@ if (TDS < TDS_lowest){
   }
 }
 void dose_pump_pH_down(void) {                             //pump 3
-if (pH_compensated > pH_highest){
+if (pH > pH_highest){
   //SEND COMMAND IN ASCII (STRING)
-    //mySerial3.println("d," + (String)pH_down_dosage);
+    mySerial3.println("d," + (String)pH_down_dosage);
     Serial.println("  Pump 3 is lowering the pH...");
   }
     else{
-    //mySerial3.println("d,Sleep");                          //enter low power mode
+    mySerial3.println("d,Sleep");                          //enter low power mode
     Serial.println("  Pump 3 is sleeping...");
   }
 }
 void dose_pump_TDS_down(void) {                               //pump 4
 if (TDS > TDS_highest){
   //SEND COMMAND IN ASCII (STRING)
-    //mySerial4.println("d," + (String)TDS_down_dosage);
+    mySerial4.println("d," + (String)TDS_down_dosage);
     Serial.println("  Pump 4 is lowering the TDS...");
   }
     else{
-    //mySerial4.println("d,Sleep");                          //enter low power mode
+    mySerial4.println("d,Sleep");                          //enter low power mode
     Serial.println("  Pump 4 is sleeping...");
   }
 }
