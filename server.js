@@ -154,28 +154,26 @@ app.get('/values', async (req, res) => { //change the order of items //WARNING: 
 })
 
 app.get('/control', checkAuthenticated, (req,res) => {
+    dataFlag = true
     res.render('control.ejs')
 })
 
 app.post('/control', async (req,res) => {
     try{
-        dataFlag = true
         let stringy = 's' + ',' + req.body.fanspeed + ',' + req.body.lph + ',' + req.body.hph + ',' + req.body.lTDS + ',' + req.body.hTDS + 
          ',' + req.body.ontime + ',' + req.body.offtime + ',' + req.body.hhum + ','  + req.body.htemp//settings have to be here instead of ruuvi data
         let arr = stringy.split(',') //to send humidity data constantly a loop is needed which will be paused for the duration of this here post route function
         //console.log(arr + 'here')
         clearInterval(interval1)
-                port.write(stringy, (err) => {
-                    if (err) {
-                        console.log('Didnt work')
-                    }
-                    else {
-                        console.log('Succccess')
-                        console.log(arr)
-                    }
-                })
-
-        res.redirect('/control')
+        port.write(stringy, (err) => {
+            if (err) {
+                console.log('Didnt work')
+            }
+            else {
+                console.log('Succccess')
+                console.log(arr)
+            }
+        })
         dataFlag = false
 
         interval1 = setInterval(() => {
@@ -186,9 +184,11 @@ app.post('/control', async (req,res) => {
                 sendHumidity()
             }
         }, 10000)
+
+        res.redirect('/home')
     }
     catch{
-        res.redirect('/control')
+        res.redirect('/home')
     } 
 })
 
@@ -204,15 +204,15 @@ const sendHumidity = async () => {
     let ruuviProQ = await knex.ruuvidata('ruuviPro').max('time').select('Temp', 'Hum')
     let stringy = 'r, ' + ruuvi1Q[0].Temp + ', ' + ruuvi1Q[0].Hum + ', ' + ruuviProQ[0].Temp + ', ' + ruuviProQ[0].Hum
     let arr1 = stringy.split(',')
-            port.write(stringy, (err) => {
-                if (err) {
-                    console.log('Didnt work')
-                }
-                else {
-                    console.log('Succccess')
-                    console.log(stringy)
-                }
-            })
+    port.write(stringy, (err) => {
+        if (err) {
+            console.log('Didnt work')
+        }
+        else {
+            console.log('Succccess')
+            console.log(stringy)
+        }
+    })
 }
 
 function checkAuthenticated(req, res, next) {

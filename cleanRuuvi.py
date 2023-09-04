@@ -29,7 +29,7 @@ def emptyTable2 (conn):
 
 conn=create_connection('ruuvidata.sqlite')
 
-print('Starting cleanup in 30 seconds')
+print('Starting cleanup in 5 minutes')
 
 while True:
     with conn:
