@@ -262,7 +262,7 @@
             rh1.textContent = arr[3]
           }
           if (wlvl) {
-            wlvl.textContent = arr[8]
+            wlvl.textContent = arr[6]
           }
           if (wtemp) {
             wtemp.textContent = arr[9]
@@ -286,7 +286,7 @@
           }
         
           if (alerts) {
-            if (arr[8] < 20 && arr[8] != ''){
+            if (arr[6] < 20 && arr[6] != ''){
               alerts.textContent = ' Water level low'
               document.getElementById('status').classList.add('alertsRed-bg') 
             } else if (!arr[8]){
@@ -298,10 +298,10 @@
             } else if (arr[5] <= 40){
               alerts.textContent = ' Ph down solution ' + arr[5] + '%'
               document.getElementById('status').classList.add('alertsRed-bg')
-            } else if (arr[6] <= 40){
+            } else if (arr[7] <= 40){
               alerts.textContent = ' TDS up solution ' + arr[6] + '%'
               document.getElementById('status').classList.add('alertsRed-bg')
-            } else if (arr[7] <= 40){
+            } else if (arr[8] <= 40){
               alerts.textContent = ' TDS down solution ' + arr[7] + '%'
               document.getElementById('status').classList.add('alertsRed-bg')
             } else {
