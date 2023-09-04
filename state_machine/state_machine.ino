@@ -49,14 +49,14 @@ int fan_control_M2A_pin = 44;
 
 //--------------------------RELAYS-----------------------------
 
-//Dosing pumps -> Relay 1
+//Dosing pumps -> Relay Block B
 const byte dose_pump_12V_pin_1 = 23;
 const byte dose_pump_12V_pin_2 = 24;
 const byte dose_pump_12V_pin_3 = 25;
 const byte dose_pump_12V_pin_4 = 26;
 
-//Main pump -> Relay 8
-const byte main_pump_pin = 30;
+//Main pump -> Relay Block B
+const byte main_pump_pin = 22;
 
 //--------------------------CONFIG-----------------------------
 
@@ -88,7 +88,7 @@ unsigned long previous_millis = 0;                   //timer settings
 bool pump_status = false;                            //current condition of the pump (false == LOW, true == HIGH)
 
 //raspberry Pi
-float get_control[10];                               //settings from the control panel
+float get_control[10];                               //data from the control panel
 float get_ruuvi[5];                                  //data from Ruuvi tags
 float humidity_1 = 0, humidity_2 = 0;
 float temperature_air_1 = 0, temperature_air_2 = 0;
@@ -101,7 +101,7 @@ void setup() {
   sensors.begin();
 
   //water level
-    for (int i = 0; i < 5 ; i++) {                    //declare all pins using for() function
+    for (int i = 0; i < 5 ; i++) {                   //declare all pins using for() function
     pinMode(trig_pin[i], OUTPUT);
     pinMode(echo_pin[i], INPUT);}
 
@@ -158,20 +158,6 @@ void stateMachine() {
   static unsigned long start_main_pump = 5500;
   static unsigned long start_fans = 5750;
   static unsigned long start_raspberry = 6000;
-
-  /*
-  static unsigned long start_idle = 2000;
-  static unsigned long start_water_level = 2500;
-  static unsigned long start_temp = 3000;
-  static unsigned long start_pH = 3500;
-  static unsigned long start_TDS = 4000;
-  static unsigned long start_dose_pump_1 = 4500;
-  static unsigned long start_dose_pump_2 = 5000;
-  static unsigned long start_dose_pump_3 = 6500;
-  static unsigned long start_dose_pump_4 = 7000;
-  static unsigned long start_main_pump = 7500;
-  static unsigned long start_fans = 8000;
-  static unsigned long start_raspberry = 8500;*/
 
   enum class controllinoState : uint8_t {
     IDLE,
@@ -409,13 +395,13 @@ distance_5 = round(duration[4] * 0.034 / 2);
 //map(real distance, min distance, max distance, min distance in %, max distance in %)
 water_level_1 = map(distance_1, 0, 34, 100, 0);               
 water_level_2 = map(distance_2, 0, 34, 100, 0);      
-water_level_3 = map(distance_3, 0, 34, 100, 0);               
+water_level_3 = map(distance_3, 0, 28, 100, 0);               
 water_level_4 = map(distance_4, 0, 34, 100, 0);       
 water_level_5 = map(distance_5, 0, 34, 100, 0);    
-/*TEST
+//TEST
 //distance in cm 
-Serial.println("  Distance 1 in cm: " + (String)distance_1);
-Serial.println("  Distance 2 in cm: " + (String)distance_2); 
+/*Serial.println("  Distance 1 in cm: " + (String)distance_1);
+Serial.println("  Distance 1 in cm: " + (String)distance_2); 
 //distance in %
 Serial.println("  Distance in %: " + (String)water_level_1);
 Serial.println("  Distance in %: " + (String)water_level_2);
@@ -435,8 +421,8 @@ void water_temp(void) {
 //--------------------DFRobot pH V2.0----------------------
 
 void pH_level(void) {
-  pH_voltage = analogRead(pH_pin)/1024.0*5000;             // read the voltage
-  pH = ph.readPH(pH_voltage, temperature_C);   // convert voltage to pH with temperature compensation
+  pH_voltage = analogRead(pH_pin)/1024.0*5000;              // read the voltage
+  pH = ph.readPH(pH_voltage, temperature_C);                // convert voltage to pH with temperature compensation
   //Serial.print("temperature:");
   //Serial.print(temperature_C,1);
   Serial.print("  pH: ");
@@ -494,7 +480,7 @@ if (pH > pH_highest){
     Serial.println("  Pump 3 is sleeping...");
   }
 }
-void dose_pump_TDS_down(void) {                               //pump 4
+void dose_pump_TDS_down(void) {                            //pump 4
 if (TDS > TDS_highest){
   //SEND COMMAND IN ASCII (STRING)
     mySerial4.println("d," + (String)TDS_down_dosage);
