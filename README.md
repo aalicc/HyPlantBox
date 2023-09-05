@@ -1,1 +1,1 @@
-Backend for the "MoistPlants" Innovation Project
+Backend for the HyPlantBox! project. Documentation coming soon.

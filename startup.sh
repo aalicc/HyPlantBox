@@ -2,7 +2,11 @@
 
 cd /home/andreile/farmlab/innovationproj
 lxterminal -e "onboard"
-lxterminal -e "chromium-browser"
+sleep 3
 lxterminal -e "python3 /home/andreile/farmlab/innovationproj/cleanRuuvi.py"
+sleep 5
 lxterminal -e "python3 /home/andreile/farmlab/innovationproj/PythonScriptPROD.py"
+sleep 1
 sudo npm run dev
+sleep 3
+lxterminal -e "chromium-browser"
