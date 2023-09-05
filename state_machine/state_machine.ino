@@ -103,7 +103,8 @@ void setup() {
   //water level
     for (int i = 0; i < 5 ; i++) {                   //declare all pins using for() function
     pinMode(trig_pin[i], OUTPUT);
-    pinMode(echo_pin[i], INPUT);}
+    pinMode(echo_pin[i], INPUT);
+    }
 
   //pH level
   ph.begin();
@@ -307,8 +308,6 @@ float temperature_highest = 0;
 float main_pump_on_min = 0;
 float main_pump_off_min = 0;  
 
-//incoming data from Raspberry Pi is in the String format
-String fan_speed_pct_pi, pH_lowest_pi, pH_highest_pi, TDS_lowest_pi, TDS_highest_pi, humidity_highest_pi, main_pump_on_min_pi, main_pump_off_min_pi, humidity_1_ruuvi, humidity_2_ruuvi, temperature_1_ruuvi, temperature_2_ruuvi;
 
 void Pi_send(){
 //upcoming data from CONTROLLINO
@@ -395,12 +394,12 @@ distance_5 = round(duration[4] * 0.034 / 2);
 //map(real distance, min distance, max distance, min distance in %, max distance in %)
 water_level_1 = map(distance_1, 0, 34, 100, 0);               
 water_level_2 = map(distance_2, 0, 34, 100, 0);      
-water_level_3 = map(distance_3, 0, 28, 100, 0);               
+water_level_3 = map(distance_3, 0, 36, 100, 0);               
 water_level_4 = map(distance_4, 0, 34, 100, 0);       
 water_level_5 = map(distance_5, 0, 34, 100, 0);    
 //TEST
 //distance in cm 
-/*Serial.println("  Distance 1 in cm: " + (String)distance_1);
+/*Serial.println("  Distance 1 in cm: " + (String)distance_3);
 Serial.println("  Distance 1 in cm: " + (String)distance_2); 
 //distance in %
 Serial.println("  Distance in %: " + (String)water_level_1);
@@ -500,14 +499,14 @@ void main_pump(){
 
   unsigned long current_millis = millis();
 
-  if (pump_status && (current_millis - previous_millis >= main_pump_on_ms)) {           // pump ON for x milliseconds
-    Serial.println("  main pump ON");
+  if (pump_status && (current_millis - previous_millis >= main_pump_on_ms)) {           // pump OFF for x milliseconds
+    Serial.println("  main pump OFF");
     digitalWrite(main_pump_pin, LOW);
     pump_status = false;
     previous_millis = current_millis;
   }
-    else if (!pump_status && (current_millis - previous_millis >= main_pump_off_ms)) {  // pump OFF
-      Serial.println("  main pump OFF");
+    else if (!pump_status && (current_millis - previous_millis >= main_pump_off_ms)) {  // pump ON
+      Serial.println("  main pump ON");
       digitalWrite(main_pump_pin, HIGH);
       pump_status = true;
       previous_millis = current_millis;
@@ -520,6 +519,11 @@ void fans() {
 fan_speed = map(fan_speed_pct, 0, 100, 0, 255);                                    //convert % to the actual speed value
 
 if ((humidity_1 >= humidity_highest || humidity_2 >= humidity_highest) && (fan_speed_pct > 0)) {
+  analogWrite(fan_control_M1A_pin, fan_speed );
+  analogWrite(fan_control_M2A_pin, fan_speed );
+  //Serial.println("  Fan speed set on " + (String)fan_speed_pct);
+} 
+else if ((temperature_air_1 >= temperature_highest || temperature_air_2 >= temperature_highest) && (fan_speed_pct > 0)) {
   analogWrite(fan_control_M1A_pin, fan_speed );
   analogWrite(fan_control_M2A_pin, fan_speed );
   //Serial.println("  Fan speed set on " + (String)fan_speed_pct);
