@@ -34,7 +34,7 @@ initializePassport(
     id => users.find(user => user.id === id)
 )
 
-
+//loop for sending humidity values
 interval1 = setInterval(() => {
     if (dataFlag) {
         return
@@ -42,12 +42,12 @@ interval1 = setInterval(() => {
     if (!dataFlag){
         sendHumidity()
     }
-}, 10000) //SHOULD BE MORE THAN THE STATE MACHINE STATE AND PREV STATES
+}, 10000)
 
 
 //serial connection
 const port = new SerialPort({
-    path:'/dev/ttyS0', //try connecting via pins
+    path:'/dev/ttyS0',
     baudRate: 19200,
     autoOpen: false
 })
@@ -63,16 +63,7 @@ port.open((err) => {
       // Read data from the serial port
       parser.on('data', (line) => {
         valuesCon = line
-        //console.log(valuesCon)
       })
-     /* const sendData = 'Hello, Controllino!'
-      port.write(sendData, (err) => {
-        if (err) {
-          console.error('Error writing to port:', err)
-        } else {
-          console.log('Sent:', sendData)
-        }
-      })*/
     }
 })
 
@@ -199,6 +190,7 @@ app.get('/logout', checkAuthenticated, (req, res) => {
     })
 })
 
+//functions
 const sendHumidity = async () => {
     let ruuvi1Q = await knex.ruuvidata('ruuvi1').max('time').select('Temp', 'Hum')
     let ruuviProQ = await knex.ruuvidata('ruuviPro').max('time').select('Temp', 'Hum')
