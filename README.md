@@ -1,5 +1,5 @@
 # HyPlantBox!
-HyPlantBox! is a hydroponic growing system for plants originated from https://github.com/embedded-sergey/innoproject
+HyPlantBox! project represents a user-friendly IoT-based hydroponic system controlled by an automation box. This system features a web-based user interface, enabling users to both monitor and adjust vital system parameters with ease. 
 <br />What's cool about it? Idk
 <br />In our system CONTROLLINO MAXI is the brain, and Raspberry Pi is giving it orders.
 <br />
