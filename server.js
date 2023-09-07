@@ -91,7 +91,6 @@ app.get('/', checkNotAuthenticated,(req, res) =>{
 
 app.get('/home', checkAuthenticated, (req, res) =>{
     let name = req.user.name
-    console.log(name)
     res.render('index.ejs', {name})
 })
 
@@ -136,7 +135,6 @@ app.get('/values', async (req, res) => { //change the order of items //WARNING: 
     if (valuesCon !== undefined) {
     values += valuesCon.toString();
     } 
-    console.log(values)
     const response = {
         value: values
     }
@@ -152,9 +150,8 @@ app.get('/control', checkAuthenticated, (req,res) => {
 app.post('/control', async (req,res) => {
     try{
         let stringy = 's' + ',' + req.body.fanspeed + ',' + req.body.lph + ',' + req.body.hph + ',' + req.body.lTDS + ',' + req.body.hTDS + 
-         ',' + req.body.ontime + ',' + req.body.offtime + ',' + req.body.hhum + ','  + req.body.htemp//settings have to be here instead of ruuvi data
-        let arr = stringy.split(',') //to send humidity data constantly a loop is needed which will be paused for the duration of this here post route function
-        //console.log(arr + 'here')
+         ',' + req.body.ontime + ',' + req.body.offtime + ',' + req.body.hhum + ','  + req.body.htemp
+        let arr = stringy.split(',')
         clearInterval(interval1)
         port.write(stringy, (err) => {
             if (err) {
@@ -162,7 +159,6 @@ app.post('/control', async (req,res) => {
             }
             else {
                 console.log('Succccess')
-                console.log(arr)
             }
         })
         dataFlag = false
@@ -198,10 +194,10 @@ const sendHumidity = async () => {
     let arr1 = stringy.split(',')
     port.write(stringy, (err) => {
         if (err) {
-            console.log('Didnt work')
+            console.log('Humidity Didnt work')
         }
         else {
-            console.log('Succccess')
+            console.log('Succccess on Humidity')
             console.log(stringy)
         }
     })
