@@ -29,11 +29,11 @@ const byte pH_pin = A1;
 float pH_voltage, pH;
 DFRobot_PH ph;
 
-//TDS sensor -> X1                                  //mentined later as EC sensor
+//TDS sensor -> X1                                  
 const byte TDS_pin = A0;
 
 //Dosing pumps -> X2 
-  SoftwareSerial mySerial1(13, 43);                 //(rx, tx) = (SDA, SCL)
+  SoftwareSerial mySerial1(13, 43);                 //(rx, tx) => (SDA, SCL)
   SoftwareSerial mySerial2(11, 9);                  
   SoftwareSerial mySerial3(12, 42);               
   SoftwareSerial mySerial4(10, 8);                
@@ -45,20 +45,20 @@ int fan_control_M1A_pin = 45;
 int fan_control_M2A_pin = 44;
 
 //raspberry Pi -> X1
-#define mySerial Serial1
+#define mySerial Serial1                            //Hardware serial
 
 //--------------------------RELAYS-----------------------------
 
 //Dosing pumps -> Relay Block B
-const byte dose_pump_12V_pin_1 = 23;
-const byte dose_pump_12V_pin_2 = 24;
-const byte dose_pump_12V_pin_3 = 25;
-const byte dose_pump_12V_pin_4 = 26;
+const byte dose_pump_12V_1 = 23;
+const byte dose_pump_12V_2 = 24;
+const byte dose_pump_12V_3 = 25;
+const byte dose_pump_12V_4 = 26;
 
 //Main pump -> Relay Block B
 const byte main_pump_pin = 22;
 
-//--------------------------CONFIG-----------------------------
+//--------------------------CONFIG----------------------------
 
 //Water level 
 float duration[5];
@@ -70,7 +70,7 @@ float temperature_C;
 //OneWire settings
 OneWire oneWire(temperature_pin);
 DallasTemperature sensors(&oneWire);
-uint8_t sensor1[8] = {0x28, 0x12, 0xF2, 0x20, 0x0F, 0x00, 0x00, 0x21};
+uint8_t sensor1[8] = {0x28, 0x12, 0xF2, 0x20, 0x0F, 0x00, 0x00, 0x21};        //address of t° sensor
 
 //TDS sensor
 const float a = 0.020;
@@ -93,7 +93,7 @@ float get_ruuvi[5];                                  //data from Ruuvi tags
 float humidity_1 = 0, humidity_2 = 0;
 float temperature_air_1 = 0, temperature_air_2 = 0;
 
-//--------------------------SETUP------------------------------
+//--------------------------SETUP-----------------------------
 
 void setup() {
   //general
@@ -101,7 +101,7 @@ void setup() {
   sensors.begin();
 
   //water level
-    for (int i = 0; i < 5 ; i++) {                   //declare all pins using for() function
+    for (int i = 0; i < 5 ; i++) {                   //actvate all pins using for() function
     pinMode(trig_pin[i], OUTPUT);
     pinMode(echo_pin[i], INPUT);
     }
@@ -110,14 +110,14 @@ void setup() {
   ph.begin();
 
   //dosing pumps
-  pinMode(dose_pump_12V_pin_1, OUTPUT);
-  digitalWrite(dose_pump_12V_pin_1, HIGH);
-  pinMode(dose_pump_12V_pin_2, OUTPUT);
-  digitalWrite(dose_pump_12V_pin_2, HIGH);
-  pinMode(dose_pump_12V_pin_3, OUTPUT);
-  digitalWrite(dose_pump_12V_pin_3, HIGH);
-  pinMode(dose_pump_12V_pin_4, OUTPUT);
-  digitalWrite(dose_pump_12V_pin_4, HIGH);
+  pinMode(dose_pump_12V_1, OUTPUT);
+  digitalWrite(dose_pump_12V_1, HIGH);
+  pinMode(dose_pump_12V_2, OUTPUT);
+  digitalWrite(dose_pump_12V_2, HIGH);
+  pinMode(dose_pump_12V_3, OUTPUT);
+  digitalWrite(dose_pump_12V_3, HIGH);
+  pinMode(dose_pump_12V_4, OUTPUT);
+  digitalWrite(dose_pump_12V_4, HIGH);
 
   mySerial1.begin(19200);
   mySerial2.begin(19200);
@@ -138,7 +138,7 @@ void setup() {
   mySerial.begin(19200);
 }
 
-//---------------------------LOOP------------------------------
+//---------------------------LOOP-----------------------------
 
 void loop() {
   stateMachine();
@@ -310,12 +310,13 @@ float main_pump_off_min = 0;
 
 
 void Pi_send(){
-//upcoming data from CONTROLLINO
+//outgoing data from CONTROLLINO
 String sensor_data = (String)water_level_1 + "&" + (String)water_level_2 + "&" +(String)water_level_3 + "&" + (String)water_level_4 + "&" + (String)water_level_5 + "&" + (String)temperature_C + "&" + (String)pH + "&" + (String)TDS + "&" + (String)fan_speed_pct + "&" + (String)pump_status;
 Serial1.println(sensor_data);
 }
 
 void Pi_receive(){
+//incoming data to CONTROLLINO 
 char ruuvi_chars[30];                                   //ruuvi values in char format
 char control_chars[60];                                 //values from the control panel in char format
 char *delim = ",";
@@ -352,7 +353,6 @@ float token_float;
   }
 
 //convert received data to the right format
-//settings from the control panel
 fan_speed_pct = get_control[1];
 pH_lowest = get_control[2];
 pH_highest = get_control[3];
@@ -370,13 +370,13 @@ temperature_air_2 = get_ruuvi[3];
 humidity_2 = get_ruuvi[4];
 }
 
-//------------------SENSORS & OUTPUT DEVICES-------------------
+//------------------SENSORS & OUTPUT DEVICES----------------------
 
-//--------------------------HC-SR04----------------------------
+//--------------------------HC-SR04---------------------------
 
 void water_level(void) {
   float water_level_sum_1 = 0, water_level_sum_2 = 0;
-  for (int i = 0; i < 5 ; i++) {                          //"i" = number of ultrasonic sensor used
+  for (int i = 0; i < 5 ; i++) {                          //"i" = number of ultrasonic sensors used
     digitalWrite(trig_pin[i], LOW);
     delayMicroseconds(2);
     digitalWrite(trig_pin[i], HIGH);
@@ -409,7 +409,7 @@ Serial.println("  Distance in %: " + (String)water_level_4);
 Serial.println("  Distance in %: " + (String)water_level_5);*/
 }
 
-//--------------------DS18B20 One wire--------------------
+//-------------------DS18B20 One wire------------------------
 
 void water_temp(void) {
   sensors.requestTemperatures();
@@ -417,7 +417,7 @@ void water_temp(void) {
   Serial.println("  Temp1 (°C): " + (String)temperature_C);
 }
 
-//--------------------DFRobot pH V2.0----------------------
+//-------------------DFRobot pH V2.0-------------------------
 
 void pH_level(void) {
   pH_voltage = analogRead(pH_pin)/1024.0*5000;              // read the voltage
@@ -428,7 +428,7 @@ void pH_level(void) {
   Serial.println(pH,2);             
 }
 
-//-----------------------Grove TDS------------------------
+//----------------------Grove TDS----------------------------
 
 void TDS_level(void) {
   float TDS_raw, TDS_volt = 0, TDS_raw_sum = 0, TDS_raw_average = 0, temp_comp;
@@ -444,7 +444,7 @@ void TDS_level(void) {
     Serial.println("  TDS (ppm): " + (String)TDS);
   }
 
-//--------------Atlas Scientific SGL-PMP-BX----------------
+//---------------Atlas Scientific SGL-PMP-BX-----------------
 
 void dose_pump_pH_up(void) {                               //pump 1
 if (pH < pH_lowest){
@@ -457,10 +457,10 @@ if (pH < pH_lowest){
     Serial.println("  Pump 1 is sleeping...");
   }
 }
-void dose_pump_TDS_up(void) {                               //pump 2
+void dose_pump_TDS_up(void) {                              //pump 2
 if (TDS < TDS_lowest){
   //SEND COMMAND IN ASCII (STRING)
-    mySerial2.println("d," + (String)TDS_up_dosage);
+    mySerial2.println("d," + (String)TDS_up_dosage);       //dispose x milliliters -> D,X 
     Serial.println("  Pump 2 is raising the TDS...");
   }
   else{
@@ -471,7 +471,7 @@ if (TDS < TDS_lowest){
 void dose_pump_pH_down(void) {                             //pump 3
 if (pH > pH_highest){
   //SEND COMMAND IN ASCII (STRING)
-    mySerial3.println("d," + (String)pH_down_dosage);
+    mySerial3.println("d," + (String)pH_down_dosage);      //dispose x milliliters -> D,X 
     Serial.println("  Pump 3 is lowering the pH...");
   }
     else{
@@ -482,7 +482,7 @@ if (pH > pH_highest){
 void dose_pump_TDS_down(void) {                            //pump 4
 if (TDS > TDS_highest){
   //SEND COMMAND IN ASCII (STRING)
-    mySerial4.println("d," + (String)TDS_down_dosage);
+    mySerial4.println("d," + (String)TDS_down_dosage);      //dispose x milliliters -> D,X 
     Serial.println("  Pump 4 is lowering the TDS...");
   }
     else{
@@ -491,7 +491,7 @@ if (TDS > TDS_highest){
   }
 }
 
-//-----------------------MAIN WATER PUMP------------------------
+//---------------------MAIN WATER PUMP-----------------------
 
 void main_pump(){
   float main_pump_on_ms = main_pump_on_min * 60000;                                     //convert user input from minutes to milliseconds
@@ -505,7 +505,7 @@ void main_pump(){
     pump_status = false;
     previous_millis = current_millis;
   }
-    else if (!pump_status && (current_millis - previous_millis >= main_pump_off_ms)) {  // pump ON
+    else if (!pump_status && (current_millis - previous_millis >= main_pump_off_ms)) {  // pump ON for x milliseconds
       Serial.println("  main pump ON");
       digitalWrite(main_pump_pin, HIGH);
       pump_status = true;
@@ -513,17 +513,17 @@ void main_pump(){
   }
 }
 
-//---------------------------FANS------------------------------
+//---------------------------FANS----------------------------
 
 void fans() {
-fan_speed = map(fan_speed_pct, 0, 100, 0, 255);                                    //convert % to the actual speed value
+fan_speed = map(fan_speed_pct, 0, 100, 0, 255);                                                                           //convert % to the actual speed value
 
-if ((humidity_1 >= humidity_highest || humidity_2 >= humidity_highest) && (fan_speed_pct > 0)) {
+if ((humidity_1 >= humidity_highest || humidity_2 >= humidity_highest) && (fan_speed_pct > 0)) {                          //check if humidity meets the threshold
   analogWrite(fan_control_M1A_pin, fan_speed );
   analogWrite(fan_control_M2A_pin, fan_speed );
   //Serial.println("  Fan speed set on " + (String)fan_speed_pct);
 } 
-else if ((temperature_air_1 >= temperature_highest || temperature_air_2 >= temperature_highest) && (fan_speed_pct > 0)) {
+else if ((temperature_air_1 >= temperature_highest || temperature_air_2 >= temperature_highest) && (fan_speed_pct > 0)) { //check temperature
   analogWrite(fan_control_M1A_pin, fan_speed );
   analogWrite(fan_control_M2A_pin, fan_speed );
   //Serial.println("  Fan speed set on " + (String)fan_speed_pct);
