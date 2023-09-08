@@ -10,7 +10,7 @@ The system includes typical sensors used for water and air quality monitoring i.
 ![HyPlantBox_block_diagram](https://github.com/aalicc/HyPlantBox/assets/105237164/98f8f401-8a26-4b9f-9e56-a6b9018e6e29)
 <br />
 <br />
-<img src="https://github.com/aalicc/HyPlantBox/assets/105237164/27f5cd0e-d3e8-40ba-ba3e-f67ace51745e" alt="Picture of the box" height="425px" width="348px">
+<img src="https://github.com/aalicc/HyPlantBox/assets/105237164/27f5cd0e-d3e8-40ba-ba3e-f67ace51745e" alt="Picture of the box" height="425px" width="342px">
 
 
 The web interface runs on the Raspberry Pi which is serially connected to the CONTROLLINO MAXI. It gives the end user the ability to observe the current state of the system, and it gives the user warnings when the amount of some solution depletes beyond a threshold of 40%. Also, the user can change how the system works by interacting with the included control panel, from where they can adjust the fan speed, the main water pump cycle, and the thresholds which trigger the solution pumps and the fans.
