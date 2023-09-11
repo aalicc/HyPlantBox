@@ -33,10 +33,10 @@ DFRobot_PH ph;
 const byte TDS_pin = A0;
 
 //Dosing pumps -> X2 
-  SoftwareSerial mySerial1(13, 43);                 //(rx, tx) => (SDA, SCL)
-  SoftwareSerial mySerial2(11, 9);                  
-  SoftwareSerial mySerial3(12, 42);               
-  SoftwareSerial mySerial4(10, 8);                
+SoftwareSerial mySerial1(13, 43);                 //(rx, tx) => (SDA, SCL)
+SoftwareSerial mySerial2(11, 9);                  
+SoftwareSerial mySerial3(12, 42);               
+SoftwareSerial mySerial4(10, 8);                
 
 //fan
 int fan_speed;
@@ -44,7 +44,7 @@ int fan_speed;
 int fan_control_M1A_pin = 45;
 int fan_control_M2A_pin = 44;
 
-//raspberry Pi -> X1
+//Raspberry Pi -> X1
 #define mySerial Serial1                            //Hardware serial
 
 //--------------------------RELAYS-----------------------------
