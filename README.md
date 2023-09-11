@@ -25,7 +25,9 @@ The web interface runs on the Raspberry Pi which is serially connected to the CO
 ### Hardware
 
 
-#### Software
+### Software
+#### Controllino
+#### Raspberry Pi
 1.	Download to your local repository
 2.	Open the startup.sh script with a text editor
 3.	Change the paths, so that they point to the repository
@@ -34,3 +36,9 @@ The web interface runs on the Raspberry Pi which is serially connected to the CO
 6.	In “server.js” file, change the Serial port to the desired one and change the baud rate
 7.	(Optional) Install SQLite3
 8.	Run the startup.sh script
+
+## Contributing
+.
+## Contact info
+.
+## Links
