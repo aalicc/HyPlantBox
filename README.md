@@ -5,10 +5,22 @@ HyPlantBox! project represents a user-friendly IoT-based hydroponic system contr
 <br />In our system CONTROLLINO MAXI is the brain, and the end user gives it orders by using the web interface, that runs on a Raspberry Pi.
 <br />
 <br />
-## Features
-
 ## Components
-.
+* CONTROLLINO MAXI
+* Raspberry Pi 4B
+* Power supply: DRS-240-12
+* Water level meter: HC-SR04
+* pH sensor: DFRobot Industrial pH Sensor v2
+* TDS sensor: Grove – TDS Sensor
+* Dosing pump: EZO-PMP-BX
+* Main pump: BILTEMA art. 25-999
+* Fan: Attwood turbo 4000
+* 2-channel motor driver: MDD3A
+* Protected cables of different thickness
+* Automation box
+* 2 DIN rails
+* Connectors
+* 3D printed holders
 ## Web interface
 ### Built with
 * ![Bootstrap](https://img.shields.io/badge/bootstrap-%238511FA.svg?style=for-the-badge&logo=bootstrap&logoColor=white)
