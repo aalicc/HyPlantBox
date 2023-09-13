@@ -1,8 +1,5 @@
 ## HyPlantBox!
-
 HyPlantBox! project represents a user-friendly IoT-based hydroponic system controlled by an automation box. This system features a web-based user interface, enabling users to both monitor and adjust vital system parameters with ease. Originating from the students' Innovation Project (see "innoproject" repository) , this project received financial support of UrbanFarmLab and Metropolia UAS, underscoring its potential for practical greenhouse applications.
-<br />What's cool about it? Everything!
-<br />In our system CONTROLLINO MAXI is the brain, and the end user gives it orders by using the web interface, that runs on a Raspberry Pi.
 <br />
 ## Components
 * CONTROLLINO MAXI
@@ -30,10 +27,16 @@ HyPlantBox! project represents a user-friendly IoT-based hydroponic system contr
 * ![SQLite](https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white)
 ## Getting Started
 The system includes typical sensors used for water and air quality monitoring i.e, pH, EC, temperature and humidity meters. These in turn are responsible for triggering the activation of mechanical devices, such as pumps and fans. The significance of pumps lies not only in delivering water to the growing channels but also in dispensing the necessary nutrients automatically.
-
+![Pumps working](https://media.giphy.com/media/20IqPq7Z8fLSujgLiN/giphy.gif)
+.
 ![HyPlantBox_block_diagram](https://github.com/aalicc/HyPlantBox/assets/105237164/98f8f401-8a26-4b9f-9e56-a6b9018e6e29)
 <br />
-<br />
+As shown on the diagram, all the sensors are located on the left and the mechanical equipment is on the right. In the center of the picture are the elements of the control panel. For a comprehensive pinout diagram specific to the CONTROLLINO MAXI, please
+refer to the Controllino website.
+Note: CONTROLLINO provides power for sensors and devices ranging from 5V to 12V, while CONTROLLINO itself is supplied by 12V DRS-240-12 power supply.
+As was mentioned earlier the system has certain dependencies. Due to DS18B20 waterproof temperature sensor, temperature compensation is applied to the DFRobot pH and Grove TDS meters, enhancing the accuracy of their readings. These readings, in turn, regulate the activation of the EZO-PMP dosing pumps. The specified threshold for pH and TDS triggers the pumps to either decrease or increase respective parameters in the main water tank by pumping up the appropriate solution (5 ml at a time by default). Another noteworthy component is the MDD3A, serving as the motor driver within the system. This component enables precise control over fan speed by utilizing PWM signals. By changing the connection from M1A to M1B, the first fan can be made to rotate in the opposite direction. This same method can be applied to the second fan, providing versatile control over both fan units.
+
+Here is an example of the finished automation box
 <img src="https://github.com/aalicc/HyPlantBox/assets/105237164/27f5cd0e-d3e8-40ba-ba3e-f67ace51745e" alt="Picture of the box" height="425px" width="342px">
 
 The web interface runs on the Raspberry Pi which is serially connected to the CONTROLLINO MAXI. It gives the end user the ability to observe the current state of the system, and it gives the user warnings when the amount of some solution depletes beyond a threshold of 40%. Also, the user can change how the system works by interacting with the included control panel, from where they can adjust the fan speed, the main water pump cycle, and the thresholds which trigger the solution pumps and the fans.
@@ -54,6 +57,8 @@ The web interface runs on the Raspberry Pi which is serially connected to the CO
 7.	(Optional) Install SQLite3
 8.	Run the startup.sh script
 
+## Possible improvements
+.
 ## Contact info
 andreileb23@gmail.com
 alissa.subina@gmail.com
