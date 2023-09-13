@@ -16,6 +16,7 @@ HyPlantBox! project represents a user-friendly IoT-based hydroponic system contr
 * Main pump: BILTEMA art. 25-999
 * Fan: Attwood turbo 4000
 * 2-channel motor driver: MDD3A
+* Joy-IT Raspberry Pi case with coolers
 * Protected cables of different thickness
 * Automation box
 * 2 DIN rails
