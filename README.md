@@ -58,10 +58,28 @@ Gif 2. Web Interface demo
 
 
 ### Hardware
-
+The system assembly requires some knowledge of serial communication.
 
 ### Software
 #### Controllino
+1. Install Arduino IDE on your computer
+2. Run Arduino IDE
+3. Install CONTROLLINO library
+    - Go to Sketch -> Include Library -> Manage Libraries
+    - Type CONTROLLINO in search box
+    - Press Install
+    - Navigate to File -> Preferences
+    - Insert the link into Additional boards manager URLs and press OK:
+      https://raw.githubusercontent.com/CONTROLLINO-PLC/CONTROLLINO_Library/master/Boards/package_ControllinoHardware_index.json
+    - Go to Tools -> Board:  -> Boards Manager
+    - Search for CONTROLLINO
+    - Install CONTROLLINO boards
+4. Open state_machine.ino
+5. Download and install ‘DFRobot_PH.h’ library from: https://github.com/DFRobot/DFRobot_PH
+6. Check if other libraries specified in the code are installed on your computer
+7. Run state_machine.ino
+
+
 #### Raspberry Pi
 1.	Download to your local repository
 2.	Open the startup.sh script with a text editor
