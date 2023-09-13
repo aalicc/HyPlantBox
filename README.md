@@ -67,7 +67,6 @@ Figure 1. HyPlantBox! block diagram
 <br />
 <br />
 As shown on the diagram, all the sensors are located on the left and the mechanical equipment is on the right. In the center of the picture are the elements of the control panel. For a comprehensive pinout diagram specific to the CONTROLLINO MAXI, please refer to the Controllino website.<br />
-<br />
 
 ### Software
 #### Controllino
@@ -100,7 +99,33 @@ As shown on the diagram, all the sensors are located on the left and the mechani
 8.	Run the startup.sh script
 
 ## Possible improvements
-.
+<br />
+* Immediate activation of pumps and fans upon system startup.
+<br />
+    Upon plugging in the system, the pumps and fans start operating immediately,
+    contrary to the expected behavior where they should remain off until the user
+    configures the settings.
+    Resolution of the problem may involve triggering the “Maintenance Mode” within
+    the code right after the application starts.
+<br />
+* Inconsistent operation of Python script for Ruuvitags data retrieval.
+    The Python script designed to retrieve the data from Ruuvitags exhibits occasional
+    failures, which did not occur during standalone testing. The error indicates a
+    connection timeout, possibly due to interference with the Bluetooth connection
+    from other electronics near the Raspberry Pi within enclosure.
+    Resolution of the issue would involve investigation and mitigation of the source of
+    interference. Another option would be complete replacement of Ruuvitags for a
+    different sensor with a different communication type.
+<br />
+* Occasional website crashes due to database Locking.
+    Periodic crashes of the website resulting from database congestion caused by
+    multiple concurrent script accesses.Resolution of this problem would be to reboot the Raspberry Pi, or manual restart
+    of the web application, but this is not recommended.
+<br />
+* Exposure to water may disrupt the accuracy of water level measurements.
+    If the water exposure is unavoidable, it is recommended to consider replacing the
+    HC-SR04 with the waterproof version.
+
 ## Contact info
 andreileb23@gmail.com
 <br />
