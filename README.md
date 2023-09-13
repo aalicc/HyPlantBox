@@ -6,11 +6,13 @@ HyPlantBox! project represents a user-friendly IoT-based hydroponic system contr
 <br />
 <br />
 ## Features
-.
+
 ## Components
 .
 ## Web interface
-.
+### Built with
+* [![Bootstrap][Bootstrap.com]][Bootstrap-url]
+* [![JQuery][JQuery.com]][JQuery-url]
 ## Getting Started
 The system includes typical sensors used for water and air quality monitoring i.e, pH, EC, temperature and humidity meters. These in turn are responsible for triggering the activation of mechanical devices, such as pumps and fans. The significance of pumps lies not only in delivering water to the growing channels but also in dispensing the necessary nutrients automatically.
 
@@ -37,8 +39,6 @@ The web interface runs on the Raspberry Pi which is serially connected to the CO
 7.	(Optional) Install SQLite3
 8.	Run the startup.sh script
 
-## Contributing
-.
 ## Contact info
 .
 ## Links
