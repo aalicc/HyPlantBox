@@ -64,5 +64,6 @@ The web interface runs on the Raspberry Pi which is serially connected to the CO
 .
 ## Contact info
 andreileb23@gmail.com
+<br />
 alissa.subina@gmail.com
 ## Links
