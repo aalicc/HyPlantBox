@@ -4,7 +4,6 @@ HyPlantBox! project represents a user-friendly IoT-based hydroponic system contr
 <br />What's cool about it? Everything!
 <br />In our system CONTROLLINO MAXI is the brain, and the end user gives it orders by using the web interface, that runs on a Raspberry Pi.
 <br />
-<br />
 ## Components
 * CONTROLLINO MAXI
 * Raspberry Pi 4B
