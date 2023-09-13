@@ -30,8 +30,11 @@ The system includes typical sensors used for water and air quality monitoring i.
 <br />
 <br />
 ![Pumps working](https://media.giphy.com/media/20IqPq7Z8fLSujgLiN/giphy.gif)
+Recording 1. Dosing pumps working
 <br />
+
 ![HyPlantBox_block_diagram](https://github.com/aalicc/HyPlantBox/assets/105237164/98f8f401-8a26-4b9f-9e56-a6b9018e6e29)
+Figure 1. HyPlantBox! block diagram
 <br />
 As shown on the diagram, all the sensors are located on the left and the mechanical equipment is on the right. In the center of the picture are the elements of the control panel. For a comprehensive pinout diagram specific to the CONTROLLINO MAXI, please
 refer to the Controllino website.
