@@ -39,10 +39,11 @@ Note: CONTROLLINO provides power for sensors and devices ranging from 5V to 12V,
 As was mentioned earlier the system has certain dependencies. Due to DS18B20 waterproof temperature sensor, temperature compensation is applied to the DFRobot pH and Grove TDS meters, enhancing the accuracy of their readings. These readings, in turn, regulate the activation of the EZO-PMP dosing pumps. The specified threshold for pH and TDS triggers the pumps to either decrease or increase respective parameters in the main water tank by pumping up the appropriate solution (5 ml at a time by default). Another noteworthy component is the MDD3A, serving as the motor driver within the system. This component enables precise control over fan speed by utilizing PWM signals. By changing the connection from M1A to M1B, the first fan can be made to rotate in the opposite direction. This same method can be applied to the second fan, providing versatile control over both fan units.
 
 Here is an example of the finished automation box
+<br />
 <img src="https://github.com/aalicc/HyPlantBox/assets/105237164/27f5cd0e-d3e8-40ba-ba3e-f67ace51745e" alt="Picture of the box" height="425px" width="342px">
 
 The web interface runs on the Raspberry Pi which is serially connected to the CONTROLLINO MAXI. It gives the end user the ability to observe the current state of the system, and it gives the user warnings when the amount of some solution depletes beyond a threshold of 40%. Also, the user can change how the system works by interacting with the included control panel, from where they can adjust the fan speed, the main water pump cycle, and the thresholds which trigger the solution pumps and the fans.
-
+<br />
 ![GIF](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmh6MmplZ3J1MjJrZXE5NDB6cWd0bTN0eGJ0MnhrN3A5a3I2aGFtdyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Gzvg4E2RT3h02zhKSJ/giphy-downsized-large.gif)
 ### Hardware
 
