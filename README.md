@@ -37,8 +37,8 @@ Gif 1. Dosing pumps working
 <br />
 <br />
 As was already mentioned the system has certain dependencies. Due to waterproof temperature sensor, temperature compensation is applied to the DFRobot pH and Grove TDS meters, enhancing the accuracy of their readings. These readings, in turn, regulate the activation of the dosing pumps. The specified threshold for pH and TDS triggers the pumps to either decrease or increase respective parameters in the main water tank by pumping up the appropriate solution (5 ml at a time by default). 
-In addition to its ability to monitor and manage water parameters, the system is also equipped to respond to changes in air humidity and temperature. To accomplish this, it uses a fan control mechanism that utilizes PWM signals for precise operation. By changing the connection, the first fan can be made to rotate in the opposite direction. This same method can be applied to the second fan, providing versatile control over both fan units.
-The user can easily access connections and do neccessary changes from the automation box. Figure 1 below shows an example of the box, demonstrating its straightforward interface for users to make any modifications. 
+In addition to its ability to monitor and manage water parameters, the system is also equipped with fans to respond to changes in air humidity and temperature. The motor driver is a critical component in this regard, as it enables precise control of the ventilation speed.  By adjusting the connections, the first fan's rotation direction can be reversed, and the same approach can be used for the second fan, providing flexible control over both fan units.
+The user can easily access connections and do neccessary changes from the automation box. Figure 1 below shows an example of the box, demonstrating its straightforward design for users to make any modifications. 
 <br />
 <br />
 <img src="https://github.com/aalicc/HyPlantBox/assets/105237164/27f5cd0e-d3e8-40ba-ba3e-f67ace51745e" alt="Picture of the box" height="425px" width="342px">
