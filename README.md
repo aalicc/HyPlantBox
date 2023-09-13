@@ -56,5 +56,6 @@ The web interface runs on the Raspberry Pi which is serially connected to the CO
 8.	Run the startup.sh script
 
 ## Contact info
-.
+andreileb23@gmail.com
+alissa.subina@gmail.com
 ## Links
