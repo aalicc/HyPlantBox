@@ -1,11 +1,13 @@
 ## HyPlantBox!
-HyPlantBox! project represents a user-friendly IoT-based hydroponic system controlled by an automation box. This system features a web-based user interface, enabling users to both monitor and adjust vital system parameters with ease. Originating from the students' Innovation Project (see "[innoproject](https://github.com/aalicc/innoproject)" repository) , this project received financial support of UrbanFarmLab and Metropolia UAS, underscoring its potential for practical greenhouse applications.
+HyPlantBox! project represents a user-friendly IoT-based hydroponic system controlled by an automation box. This system features a web-based user interface, enabling users to both monitor and adjust vital system parameters with ease. Originating from the students' Innovation Project (see [innoproject](https://github.com/aalicc/innoproject) repository) , this project received financial support of UrbanFarmLab and Metropolia UAS, underscoring its potential for practical greenhouse applications.
 <br />
 ## Components
 * CONTROLLINO MAXI
 * Raspberry Pi 4B
 * Power supply: DRS-240-12
 * Water level meter: HC-SR04
+* Temperature sensor: DS18B20
+* Humidity & temperature sensor: RuuviTag
 * pH sensor: DFRobot Industrial pH Sensor v2
 * TDS sensor: Grove – TDS Sensor
 * Dosing pump: EZO-PMP-BX
@@ -40,7 +42,7 @@ Figure 1. HyPlantBox! block diagram
 <br />
 
 As shown on the diagram, all the sensors are located on the left and the mechanical equipment is on the right. In the center of the picture are the elements of the control panel. For a comprehensive pinout diagram specific to the CONTROLLINO MAXI, please refer to the Controllino website.<br />
-Note: CONTROLLINO provides power for sensors and devices ranging from 5V to 12V, while CONTROLLINO itself is supplied by 12V DRS-240-12 power supply.<br />
+<br />
 As was mentioned earlier the system has certain dependencies. Due to DS18B20 waterproof temperature sensor, temperature compensation is applied to the DFRobot pH and Grove TDS meters, enhancing the accuracy of their readings. These readings, in turn, regulate the activation of the EZO-PMP dosing pumps. The specified threshold for pH and TDS triggers the pumps to either decrease or increase respective parameters in the main water tank by pumping up the appropriate solution (5 ml at a time by default). Another noteworthy component is the MDD3A, serving as the motor driver within the system. This component enables precise control over fan speed by utilizing PWM signals. By changing the connection from M1A to M1B, the first fan can be made to rotate in the opposite direction. This same method can be applied to the second fan, providing versatile control over both fan units.
 
 Here is an example of the finished automation box
