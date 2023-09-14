@@ -68,7 +68,7 @@ Gif 2. Web Interface demo
 Figure 1. HyPlantBox! block diagram
 <br />
 <br />
-<The system assembly requires some knowledge of serial communication.>
+<!--The system assembly requires some knowledge of serial communication.-->
 ### Software
 #### Controllino
 1. Install Arduino IDE on your computer
