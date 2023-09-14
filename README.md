@@ -56,8 +56,6 @@ The web interface runs on the Raspberry Pi which is serially connected to the CO
 <br />
 Gif 2. Web Interface demo
 <br />
-
-
 ### Hardware
 :writing_hand: The chapter is in progress... :coffee:
 <br />
