@@ -122,7 +122,7 @@ andreileb23@gmail.com
 <br />
 alissa.subina@gmail.com
 ## Links
-GitHub:<br />
+GitHub:
 Andrei
 1. https://github.com/IoTAndrew<br/>
 Alissa
