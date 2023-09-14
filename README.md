@@ -109,12 +109,10 @@ Figure 1. HyPlantBox! block diagram
     Resolution of the issue would involve investigation and mitigation of the source of
     interference. Another option would be complete replacement of Ruuvitags for a
     different sensor with a different communication type.
-<br />
 * Occasional website crashes due to database Locking.
     Periodic crashes of the website resulting from database congestion caused by
     multiple concurrent script accesses.Resolution of this problem would be to reboot the Raspberry Pi, or manual restart
     of the web application, but this is not recommended.
-<br />
 * Exposure to water may disrupt the accuracy of water level measurements.
     If the water exposure is unavoidable, it is recommended to consider replacing the
     HC-SR04 with the waterproof version.
