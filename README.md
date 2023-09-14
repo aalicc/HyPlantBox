@@ -123,13 +123,12 @@ andreileb23@gmail.com
 alissa.subina@gmail.com
 ## Links
 GitHub:<br />
-Andrei<br/>
+Andrei
 1. https://github.com/IoTAndrew<br/>
-Alissa<br/>
+Alissa
 2. https://github.com/aalicc<br/>
-innoproject<br/>
+innoproject
 3. https://github.com/aalicc/innoproject<br/>
-<br />
 CONTROLLINO MAXI<br />
 1. https://www.controllino.com/product/controllino-maxi/<br/>
 Raspberry Pi 4B<br />
