@@ -50,6 +50,7 @@ The user can easily access connections and do neccessary changes from the automa
 <br />
 Figure 1. Automation box controlled by CONTROLLINO MAXI
 <br />
+<br />
 The web interface runs on the Raspberry Pi which is serially connected to the CONTROLLINO MAXI. It gives the end user the ability to observe the current state of the system, and it gives the user warnings when the amount of some solution depletes beyond a threshold of 40%. Also, the user can change how the system works by interacting with the included control panel, from where they can adjust the fan speed, the main water pump cycle, and the thresholds which trigger the solution pumps and the fans.
 <br />
 <br />
@@ -95,7 +96,6 @@ Figure 1. HyPlantBox! block diagram
 8.	Run the startup.sh script
 
 ## Possible improvements
-<br />
 * Immediate activation of pumps and fans upon system startup.
 <br />
     Upon plugging in the system, the pumps and fans start operating immediately,
