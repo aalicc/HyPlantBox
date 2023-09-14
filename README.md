@@ -122,7 +122,8 @@ andreileb23@gmail.com
 <br />
 alissa.subina@gmail.com
 ## Links
-**GitHub**<br/>
+```diff
+-**GitHub**´´´<br/>
 Andrei: https://github.com/IoTAndrew<br/>
 Alissa: https://github.com/aalicc<br/>
 innoproject: https://github.com/aalicc/innoproject<br/>
@@ -135,6 +136,7 @@ HC-SR04: https://www.amazon.co.uk/HC-SR04-Ultrasonic-Distance-Arduino-MEGA2560/d
 DS18B20: https://www.analog.com/media/en/technical-documentation/data-sheets/DS18B20.pdf<br/>
 DFRobot Industrial pH Sensor v2: https://www.dfrobot.com/product-2069.html<br/>
 Grove - TDS Sensor: https://wiki.seeedstudio.com/Grove-TDS-Sensor/<br/>
+RuuviTag: https://ruuvi.com/ruuvitag/<br/>
 <br/>**Motor driven devices & accessories**<br/>
 EZO-PMP-BX: https://atlas-scientific.com/peristaltic/sgl-pmp-bx/<br/>
 MDD3A: https://www.cytron.io/p-3amp-4v-16v-dc-motor-driver-2-channels<br/>
