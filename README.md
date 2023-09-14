@@ -126,7 +126,17 @@ alissa.subina@gmail.com
 Andrei: https://github.com/IoTAndrew<br/>
 Alissa: https://github.com/aalicc<br/>
 innoproject: https://github.com/aalicc/innoproject<br/>
-**CONTROLLINO MAXI**: https://www.controllino.com/product/controllino-maxi/<br/>
-**Raspberry Pi 4B**: https://www.raspberrypi.com/products/raspberry-pi-4-model-b/<br/>
-**Sensors’ datasheets and instructions**<br />
+<br/>**CONTROLLINO MAXI**<br/>
+Official webpage: https://www.controllino.com/product/controllino-maxi/<br/>
+**Raspberry Pi 4B**<br/>
+Oficcial webpage: https://www.raspberrypi.com/products/raspberry-pi-4-model-b/<br/>
+<br/>**Sensors’ datasheets and instructions**<br />
 HC-SR04: https://www.amazon.co.uk/HC-SR04-Ultrasonic-Distance-Arduino-MEGA2560/dp/B07XF4815H<br/>
+DS18B20: https://www.analog.com/media/en/technical-documentation/data-sheets/DS18B20.pdf<br/>
+DFRobot Industrial pH Sensor v2: https://www.dfrobot.com/product-2069.html<br/>
+Grove - TDS Sensor: https://wiki.seeedstudio.com/Grove-TDS-Sensor/<br/>
+<br/>**Motor driven devices & accessories**<br/>
+EZO-PMP-BX: https://atlas-scientific.com/peristaltic/sgl-pmp-bx/<br/>
+MDD3A: https://www.cytron.io/p-3amp-4v-16v-dc-motor-driver-2-channels<br/>
+<br/>**Power supply**<br/>
+DRS-240-12: https://www.meanwell.com/webapp/product/search.aspx?prod=DRS-240
