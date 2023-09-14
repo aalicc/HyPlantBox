@@ -63,8 +63,6 @@ Gif 2. Web Interface demo
 ![HyPlantBox_block_diagram](https://github.com/aalicc/HyPlantBox/assets/105237164/98f8f401-8a26-4b9f-9e56-a6b9018e6e29)
 <br />
 Figure 1. HyPlantBox! block diagram
-<br />
-<br />
 ### Software
 #### Controllino
 1. Install Arduino IDE on your computer
