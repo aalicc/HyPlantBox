@@ -124,17 +124,17 @@ alissa.subina@gmail.com
 ## Links
 GitHub:<br />
 Andrei<br/>
-1. https://github.com/IoTAndrew
+1. https://github.com/IoTAndrew<br/>
 Alissa<br/>
-2. https://github.com/aalicc
+2. https://github.com/aalicc<br/>
 innoproject<br/>
-3. https://github.com/aalicc/innoproject
+3. https://github.com/aalicc/innoproject<br/>
 <br />
 CONTROLLINO MAXI<br />
-1. https://www.controllino.com/product/controllino-maxi/
+1. https://www.controllino.com/product/controllino-maxi/<br/>
 Raspberry Pi 4B<br />
-1. https://www.raspberrypi.com/products/raspberry-pi-4-model-b/
+1. https://www.raspberrypi.com/products/raspberry-pi-4-model-b/<br/>
 <br />
 Sensors’ datasheets and instructions:<br />
 1. HC-SR04<br />
-https://www.amazon.co.uk/HC-SR04-Ultrasonic-Distance-Arduino-MEGA2560/dp/B07XF4815H
+https://www.amazon.co.uk/HC-SR04-Ultrasonic-Distance-Arduino-MEGA2560/dp/B07XF4815H<br/>
