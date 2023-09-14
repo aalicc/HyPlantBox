@@ -46,7 +46,7 @@ In addition to its ability to monitor and manage water parameters, the system is
 The user can easily access connections and do neccessary changes from the automation box. Figure 1 below shows an example of the box, demonstrating its straightforward design for users to make any modifications. 
 <br />
 <br />
-<img src="https://github.com/aalicc/HyPlantBox/assets/105237164/27f5cd0e-d3e8-40ba-ba3e-f67ace51745e" alt="Picture of the box" height="425px" width="342px">
+<img src="https://github.com/aalicc/HyPlantBox/assets/56063288/0b0a01fc-e512-4a89-8ac6-4af4699bf235" alt="Picture of the box" height="425px" width="342px">
 <br />
 Figure 1. Automation box controlled by CONTROLLINO MAXI
 <br />
