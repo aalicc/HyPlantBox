@@ -97,13 +97,10 @@ Figure 1. HyPlantBox! block diagram
 
 ## Possible improvements
 * Immediate activation of pumps and fans upon system startup.
-<br />
-    Upon plugging in the system, the pumps and fans start operating immediately,
-    contrary to the expected behavior where they should remain off until the user
-    configures the settings.
-    Resolution of the problem may involve triggering the “Maintenance Mode” within
-    the code right after the application starts.
-<br />
+      -Upon plugging in the system, the pumps and fans start operating immediately,
+      contrary to the expected behavior where they should remain off until the user
+      configures the settings. Resolution of the problem may involve triggering the “Maintenance Mode” within
+      the code right after the application starts.
 * Inconsistent operation of Python script for Ruuvitags data retrieval.
     The Python script designed to retrieve the data from Ruuvitags exhibits occasional
     failures, which did not occur during standalone testing. The error indicates a
