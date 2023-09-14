@@ -62,7 +62,7 @@ Gif 2. Web Interface demo
 :writing_hand: The chapter is in progress... :coffee:
 <br />
 <br />
-![HyPlantBox_block_diagram](https://github.com/aalicc/HyPlantBox/assets/105237164/98f8f401-8a26-4b9f-9e56-a6b9018e6e29)
+![HyPlantBox_block_diagram](https://github.com/aalicc/HyPlantBox/assets/105237164/fc39680a-d0df-4925-a436-07f476e72fa8)
 <br />
 Figure 1. HyPlantBox! block diagram
 ### Software
