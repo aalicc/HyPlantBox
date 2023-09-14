@@ -42,6 +42,7 @@ Gif 1. Dosing pumps working
 <br />
 As was already mentioned the system has certain dependencies. Due to waterproof temperature sensor, temperature compensation is applied to the DFRobot pH and Grove TDS meters, enhancing the accuracy of their readings. These readings, in turn, regulate the activation of the dosing pumps. The specified threshold for pH and TDS triggers the pumps to either decrease or increase respective parameters in the main water tank by pumping up the appropriate solution (5 ml at a time by default). 
 In addition to its ability to monitor and manage water parameters, the system is also equipped with fans to respond to changes in air humidity and temperature. The motor driver is a critical component in this regard, as it enables precise control of the ventilation speed.  By adjusting the connections, the first fan's rotation direction can be reversed, and the same approach can be used for the second fan, providing flexible control over both fan units.
+<br />
 The user can easily access connections and do neccessary changes from the automation box. Figure 1 below shows an example of the box, demonstrating its straightforward design for users to make any modifications. 
 <br />
 <br />
@@ -58,7 +59,8 @@ Gif 2. Web Interface demo
 
 
 ### Hardware
-The system assembly requires some knowledge of serial communication.
+:writing_hand: The chapter is in progress... :coffee:
+<As shown on the diagram, all the sensors are located on the left and the mechanical equipment is on the right. In the center of the picture are the elements of the control panel. For a comprehensive pinout diagram specific to the CONTROLLINO MAXI, please refer to the Controllino website.>
 <br />
 <br />
 ![HyPlantBox_block_diagram](https://github.com/aalicc/HyPlantBox/assets/105237164/98f8f401-8a26-4b9f-9e56-a6b9018e6e29)
@@ -66,8 +68,7 @@ The system assembly requires some knowledge of serial communication.
 Figure 1. HyPlantBox! block diagram
 <br />
 <br />
-As shown on the diagram, all the sensors are located on the left and the mechanical equipment is on the right. In the center of the picture are the elements of the control panel. For a comprehensive pinout diagram specific to the CONTROLLINO MAXI, please refer to the Controllino website.<br />
-
+<The system assembly requires some knowledge of serial communication.>
 ### Software
 #### Controllino
 1. Install Arduino IDE on your computer
