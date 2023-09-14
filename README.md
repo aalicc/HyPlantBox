@@ -123,7 +123,9 @@ andreileb23@gmail.com
 alissa.subina@gmail.com
 ## Links
 ```diff
--**GitHub**´´´<br/>
+@@GitHub@@
+´´´
+<br/>
 Andrei: https://github.com/IoTAndrew<br/>
 Alissa: https://github.com/aalicc<br/>
 innoproject: https://github.com/aalicc/innoproject<br/>
