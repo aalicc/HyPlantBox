@@ -97,7 +97,7 @@ Figure 1. HyPlantBox! block diagram
 
 ## Possible improvements
 * Immediate activation of pumps and fans upon system startup.
-      -Upon plugging in the system, the pumps and fans start operating immediately,
+      </br>Upon plugging in the system, the pumps and fans start operating immediately,
       contrary to the expected behavior where they should remain off until the user
       configures the settings. Resolution of the problem may involve triggering the “Maintenance Mode” within
       the code right after the application starts.
