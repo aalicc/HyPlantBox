@@ -102,7 +102,7 @@ Figure 1. HyPlantBox! block diagram
       configures the settings. Resolution of the problem may involve triggering the “Maintenance Mode” within
       the code right after the application starts.
 * Inconsistent operation of Python script for Ruuvitags data retrieval.
-    The Python script designed to retrieve the data from Ruuvitags exhibits occasional
+     </br>The Python script designed to retrieve the data from Ruuvitags exhibits occasional
     failures, which did not occur during standalone testing. The error indicates a
     connection timeout, possibly due to interference with the Bluetooth connection
     from other electronics near the Raspberry Pi within enclosure.
@@ -110,11 +110,11 @@ Figure 1. HyPlantBox! block diagram
     interference. Another option would be complete replacement of Ruuvitags for a
     different sensor with a different communication type.
 * Occasional website crashes due to database Locking.
-    Periodic crashes of the website resulting from database congestion caused by
+     </br>Periodic crashes of the website resulting from database congestion caused by
     multiple concurrent script accesses.Resolution of this problem would be to reboot the Raspberry Pi, or manual restart
     of the web application, but this is not recommended.
 * Exposure to water may disrupt the accuracy of water level measurements.
-    If the water exposure is unavoidable, it is recommended to consider replacing the
+     </br>If the water exposure is unavoidable, it is recommended to consider replacing the
     HC-SR04 with the waterproof version.
 
 ## Contact info
