@@ -64,7 +64,7 @@ Gif 2. Web Interface demo
 <br />
 ![HyPlantBox_block_diagram](https://github.com/aalicc/HyPlantBox/assets/105237164/fc39680a-d0df-4925-a436-07f476e72fa8)
 <br />
-Figure 1. HyPlantBox! block diagram
+Figure 2. HyPlantBox! block diagram
 ### Software
 #### Controllino
 1. Install Arduino IDE on your computer
@@ -122,3 +122,19 @@ andreileb23@gmail.com
 <br />
 alissa.subina@gmail.com
 ## Links
+GitHub:<br />
+Andrei<br/>
+1. https://github.com/IoTAndrew
+Alissa<br/>
+2. https://github.com/aalicc
+innoproject<br/>
+3. https://github.com/aalicc/innoproject
+<br />
+CONTROLLINO MAXI<br />
+1. https://www.controllino.com/product/controllino-maxi/
+Raspberry Pi 4B<br />
+1. https://www.raspberrypi.com/products/raspberry-pi-4-model-b/
+<br />
+Sensors’ datasheets and instructions:<br />
+1. HC-SR04<br />
+https://www.amazon.co.uk/HC-SR04-Ultrasonic-Distance-Arduino-MEGA2560/dp/B07XF4815H
