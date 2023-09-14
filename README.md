@@ -122,13 +122,13 @@ andreileb23@gmail.com
 <br />
 alissa.subina@gmail.com
 ## Links
-**GitHub**:space_invader:<br/>
+**GitHub**:octocat:<br/>
 Andrei: https://github.com/IoTAndrew<br/>
 Alissa: https://github.com/aalicc<br/>
 innoproject: https://github.com/aalicc/innoproject<br/>
 <br/>**CONTROLLINO MAXI**:green_apple:<br/>
 Official webpage: https://www.controllino.com/product/controllino-maxi/<br/>
-**Raspberry Pi 4B**:grapes<br/>
+**Raspberry Pi 4B**:grapes:<br/>
 Oficcial webpage: https://www.raspberrypi.com/products/raspberry-pi-4-model-b/<br/>
 <br/>**Sensors’ datasheets and instructions**:eyeglasses:<br />
 HC-SR04: https://www.amazon.co.uk/HC-SR04-Ultrasonic-Distance-Arduino-MEGA2560/dp/B07XF4815H<br/>
