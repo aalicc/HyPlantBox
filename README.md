@@ -5,19 +5,19 @@ HyPlantBox! project represents a user-friendly IoT-based hydroponic system contr
 * CONTROLLINO MAXI
 * Raspberry Pi 4B
 * Power supply: DRS-240-12
-* 5 Water level meters: HC-SR04
+* 5 x Water level meter: HC-SR04
 * Waterproof temperature sensor: DS18B20
-* 2 Humidity & temperature sensors: RuuviTag
+* 2 x Humidity & temperature sensor: RuuviTag
 * pH sensor: DFRobot Industrial pH Sensor v2
 * TDS sensor: Grove – TDS Sensor
-* 4 Dosing pumps: EZO-PMP-BX
+* 4 x Dosing pump: EZO-PMP-BX
 * Main pump: BILTEMA art. 25-999
-* 2 Fans: Attwood turbo 4000
+* 2 x Fan: Attwood turbo 4000
 * 2-channel motor driver: MDD3A
 * Joy-IT Raspberry Pi case with coolers
 * Protected cables of different thickness
 * Automation box
-* 2 DIN rails
+* 2 x DIN rail
 * Connectors
 * 3D printed holders
 ## Web interface
