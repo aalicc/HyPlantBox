@@ -81,7 +81,7 @@ Figure 2. HyPlantBox! block diagram
     - Install CONTROLLINO boards
 4. Open state_machine.ino
 5. Download and install ‘DFRobot_PH.h’ library from: https://github.com/DFRobot/DFRobot_PH
-6. Check if other libraries specified in the code are installed on your computer
+6. Check if other libraries specified in the code are installed on your computer (usually they're istalled together with Arduino software)
 7. Run state_machine.ino
 
 
@@ -129,8 +129,8 @@ innoproject: https://github.com/aalicc/innoproject<br/>
 <br/>**CONTROLLINO MAXI** :green_apple:<br/>
 Official webpage: https://www.controllino.com/product/controllino-maxi/<br/>
 **Raspberry Pi 4B** :grapes:<br/>
-Oficcial webpage: https://www.raspberrypi.com/products/raspberry-pi-4-model-b/<br/>
-<br/>**Sensors’ datasheets and instructions** :eyeglasses:<br />
+Official webpage: https://www.raspberrypi.com/products/raspberry-pi-4-model-b/<br/>
+<br/>**Sensors’ datasheets & instructions** :eyeglasses:<br />
 HC-SR04: https://www.amazon.co.uk/HC-SR04-Ultrasonic-Distance-Arduino-MEGA2560/dp/B07XF4815H<br/>
 DS18B20: https://www.analog.com/media/en/technical-documentation/data-sheets/DS18B20.pdf<br/>
 DFRobot Industrial pH Sensor v2: https://www.dfrobot.com/product-2069.html<br/>
@@ -139,5 +139,7 @@ RuuviTag: https://ruuvi.com/ruuvitag/<br/>
 <br/>**Motor driven devices & accessories** :zap:<br/>
 EZO-PMP-BX: https://atlas-scientific.com/peristaltic/sgl-pmp-bx/<br/>
 MDD3A: https://www.cytron.io/p-3amp-4v-16v-dc-motor-driver-2-channels<br/>
+Attwood turbo 4000: <br/>
+BILTEMA art. 25-999: <br/>
 <br/>**Power supply** :electric_plug:<br/>
 DRS-240-12: https://www.meanwell.com/webapp/product/search.aspx?prod=DRS-240
