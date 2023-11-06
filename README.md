@@ -96,8 +96,9 @@ Figure 2. HyPlantBox! block diagram
 8.	Run the startup.sh script
 
 ## Possible improvements
-Although the project in its current state meets its initial goals, there are opportunities to enhance its performance and reliability. This chapter explores these areas for improvement.
+Although the project in its current state meets its initial goals, there are opportunities to enhance its performance and reliability. This chapter addresses the following potential challenges that users may encounter:
 <br />
+The following cases are possible, while using the system:
 * Immediate activation of pumps and fans upon system startup.
       </br>Upon plugging in the system, the pumps and fans start operating immediately,
       contrary to the expected behavior where they should remain off until the user
