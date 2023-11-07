@@ -69,18 +69,13 @@ Figure 2. HyPlantBox! block diagram
 <br />
 CONTROLLINO MAXI, as the core element, is located in the center of the diagram, interconnecting with the components from both sides. As shown on the diagram all the sensors are located on the left side, while the mechanical equipment is positioned on the right side. 
 <br />
-<br />
 Although the most of the system connections are straightforward, it's important to pay special attention to certain aspects.
-<br />
 <br />
 For example, the waterproof temperature sensor DS18B20 is connected utilizing One Wire technology. This means that the sensor is powered only with data and ground line. To perform this type of connection a pull-up resistor of 4.7 kOhm must be integrated between VCC and D0 pins and then as a single data line connected to CONTROLLINO. 
 <br />
-<br />
 The EZO-PMP dosing pumps functions with either UART or I2C mode. It is important to note that the pin names on the original product correspond to I2C configuration. The SCL pin is equivalent to RX, and SDA to TX in case of UART. Consequently, when operating in UART mode, the TX of the pumps is connected to the RX of the PLC, and the RX is connected to the TX of the PLC.
 <br />
-<br />
 Another noteworthy component is MDD3A, serving as the motor driver within the system. This component enables precise control over fan speed by utilizing PWM signals. The M1A, M2A and M1B, M2B pins determine rotational direction of the motors, where each number corresponds to a specific fan unit, and the letter indicating the direction. By changing the connection from A to B the fans start rotate in opposite direction. 
-<br />
 <br />
 The Raspberry Pi is linked to the CONTROLLINO via its hardware serial port, with the TX of CONTROLLINO connected to the RX of the Raspberry Pi and vice versa. The interface is displayed on a touchscreen, connected simply through microHDMI. Furthermore, data from RuuviTags, which includes air humidity and temperature measurements, is transmitted using Bluetooth Low Energy (LE).
 
