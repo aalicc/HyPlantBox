@@ -82,7 +82,7 @@ The EZO-PMP dosing pumps functions with either UART or I2C mode. It is important
 Another noteworthy component is MDD3A, serving as the motor driver within the system. This component enables precise control over fan speed by utilizing PWM signals. The M1A, M2A and M1B, M2B pins determine rotational direction of the motors, where each number corresponds to a specific fan unit, and the letter indicating the direction. By changing the connection from A to B the fans start rotate in opposite direction. 
 <br />
 <br />
-The Raspberry Pi is linked to the CONTROLLINO via its hardware serial port, with the TX of CONTROLLINO connected to the RX of the Raspberry Pi and vice versa. The interface is displayed on a touchscreen, connected simply through microHDMI. Furthermore, data from RuuviTags, which includes air humidity and temperature sensors, is transmitted using Bluetooth Low Energy (LE).
+The Raspberry Pi is linked to the CONTROLLINO via its hardware serial port, with the TX of CONTROLLINO connected to the RX of the Raspberry Pi and vice versa. The interface is displayed on a touchscreen, connected simply through microHDMI. Furthermore, data from RuuviTags, which includes air humidity and temperature measurements, is transmitted using Bluetooth Low Energy (LE).
 
 ### Software
 #### Controllino
