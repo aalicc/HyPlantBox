@@ -2,7 +2,7 @@
 HyPlantBox! project represents a user-friendly IoT-based hydroponic system controlled by an automation box. This system features a web-based user interface, enabling users to both monitor and adjust vital system parameters with ease. Originating from the students' Innovation Project (see [innoproject](https://github.com/aalicc/innoproject) repository) , this project received financial support of UrbanFarmLab and Metropolia UAS, underscoring its potential for practical greenhouse applications.
 <br />
 ## Components
-* CONTROLLINO MAXI
+* CONTROLLINO MAXI PLC
 * Raspberry Pi 4B
 * Power supply: DRS-240-12
 * 5 x Water level meter: HC-SR04
@@ -69,7 +69,7 @@ Figure 2. HyPlantBox! block diagram
 <br />
 CONTROLLINO MAXI, as the core element, is located in the center of the diagram, interconnecting with the components from both sides. As shown on the diagram all the sensors are located on the left side, while the mechanical equipment is positioned on the right side. 
 <br />
-Although the most of the system connections are straightforward, it's important to pay special attention to certain aspects.
+Although the most of the system's connections are straightforward, it's important to pay special attention to certain aspects.
 <br />
 For example, the waterproof temperature sensor DS18B20 is connected utilizing One Wire technology. This means that the sensor is powered only with data and ground line. To perform this type of connection a pull-up resistor of 4.7 kOhm must be integrated between VCC and D0 pins and then as a single data line connected to CONTROLLINO. 
 <br />
@@ -77,7 +77,7 @@ The EZO-PMP dosing pumps functions with either UART or I2C mode. It is important
 <br />
 Another noteworthy component is MDD3A, serving as the motor driver within the system. This component enables precise control over fan speed by utilizing PWM signals. The M1A, M2A and M1B, M2B pins determine rotational direction of the motors, where each number corresponds to a specific fan unit, and the letter indicating the direction. By changing the connection from A to B the fans start rotate in opposite direction. 
 <br />
-The Raspberry Pi is linked to the CONTROLLINO via its hardware serial port, with the TX of CONTROLLINO connected to the RX of the Raspberry Pi and vice versa. The interface is displayed on a touchscreen, connected simply through microHDMI. Furthermore, data from RuuviTags, which includes air humidity and temperature measurements, is transmitted using Bluetooth Low Energy (LE).
+The Raspberry Pi is linked to the CONTROLLINO via its hardware serial port, with the TX of CONTROLLINO connected to the RX of the Raspberry Pi and vice versa. The interface is displayed on a touchscreen, connected simply through microHDMI. Furthermore, data from RuuviTags, which includes air humidity and temperature measurements, is transmitted to the Pi using Bluetooth Low Energy (LE).
 
 ### Software
 #### Controllino
@@ -110,7 +110,7 @@ The Raspberry Pi is linked to the CONTROLLINO via its hardware serial port, with
 8.	Run the startup.sh script
 
 ## Possible improvements
-Although the project in its current state meets its initial goals, there are opportunities to enhance its performance and reliability. This chapter addresses the following potential challenges that users may encounter:
+Although the project in its current state meets its initial goals, there are opportunities to enhance its performance and reliability. This chapter addresses the following challenges that users may encounter:
 <br />
 * Immediate activation of pumps and fans upon system startup.
       </br>Upon plugging in the system, the pumps and fans start operating immediately,
@@ -155,7 +155,7 @@ RuuviTag: https://ruuvi.com/ruuvitag/<br/>
 <br/>**Motor driven devices & accessories** :zap:<br/>
 EZO-PMP-BX: https://atlas-scientific.com/peristaltic/sgl-pmp-bx/<br/>
 MDD3A: https://www.cytron.io/p-3amp-4v-16v-dc-motor-driver-2-channels<br/>
-Attwood turbo 4000: <br/>
-BILTEMA art. 25-999: <br/>
+Attwood turbo 4000: https://www.amazon.com/Attwood-Interior-Diameter-Resistant-12-Volt/dp/B003EX02DA?th=1<br/>
+BILTEMA art. 25-999: https://www.biltema.fi/en-fi/boat/pumps/galley-pumps/water-pressure-pump-116-lmin-2000037332<br/>
 <br/>**Power supply** :electric_plug:<br/>
 DRS-240-12: https://www.meanwell.com/webapp/product/search.aspx?prod=DRS-240
